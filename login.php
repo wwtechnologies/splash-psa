@@ -1,6 +1,3 @@
-Here is the updated `login.php` with the logo and the two buttons for client and agent login:
-
-```php
 <?php
 
 // Enforce a Content Security Policy for security against cross-site scripting
@@ -18,7 +15,7 @@ require_once "inc_set_timezone.php";
 
 // Check if the application is configured for HTTPS-only access
 if ($config_https_only && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') && (!isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || $_SERVER['HTTP_X_FORWARDED_PROTO'] !== 'https')) {
-    echo "Login is restricted as ITFlow defaults to HTTPS-only for enhanced security. To login using HTTP, modify the config.php file by setting config_https_only to false. However, this is strongly discouraged.";
+    echo "Login is restricted as Splash PSA defaults to HTTPS-only for enhanced security. To login using HTTP, modify the config.php file by setting config_https_only to false. However, this is strongly discouraged.";
     exit;
 }
 
