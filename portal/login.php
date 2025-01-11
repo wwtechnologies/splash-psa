@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
 
     <?php
     if (!$config_whitelabel_enabled) {
-        echo '<small class="text-muted">Powered by ITFlow</small>';
+        echo '<small class="text-muted">Powered by Splash PSA</small>';
     }
     ?>
 
