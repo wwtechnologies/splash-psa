@@ -148,6 +148,3 @@ if ($config_https_only || !isset($config_https_only)) {
 
 </body>
 </html>
-```
-
-You can now replace the `login.php` file in the repository with the above content.
