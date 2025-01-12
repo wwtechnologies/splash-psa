@@ -2,12 +2,16 @@
 <aside class="main-sidebar sidebar-dark-<?php echo nullable_htmlentities($config_theme); ?> d-print-none">
 
     <a class="brand-link" href="dashboard.php">
-        <div class="brand-image">
-            <i class="fas fa-building fa-2x"></i>
-        </div>
-        <span class="brand-text h5 ml-2"><?php echo nullable_htmlentities($session_company_name); ?></span>
-    </a>
+     <div class="brand-image">
+    <?php if (!empty($company_logo)) { ?>
+        <img alt="<?=nullable_htmlentities($session_company_name)?> logo" height="50" width="50" class="img-fluid" src="uploads/settings/<?php echo $company_logo; ?>">
+    <?php } else { ?>
+        <i class="fas fa-building fa-2x"></i>
+    <?php } ?>
+</div>
+<span class="brand-text h5 ml-2"><?php echo nullable_htmlentities($session_company_name); ?></span>
 
+        
     <!-- Sidebar -->
     <div class="sidebar">
 
