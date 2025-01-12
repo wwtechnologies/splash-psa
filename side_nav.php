@@ -3,8 +3,12 @@
 
     <a class="brand-link" href="dashboard.php">
         <div class="brand-image">
-            <img alt="<?=nullable_htmlentities($session_company_name)?> logo" height="100" width="500" class="img-fluid" src="uploads/settings/<?php echo $company_logo; ?>">
-        </div>
+         <?php if (!empty($company_logo)) { ?>
+        <img alt="<?=$company_name?> logo" height="110" width="380" class="img-fluid" src="<?php echo "../uploads/settings/$company_logo"; ?>">
+    <?php } else { ?>
+        <b><?=$company_name?></b>
+    <?php } ?>
+</div>
     </a>
 
     <!-- Sidebar -->
