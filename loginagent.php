@@ -380,6 +380,7 @@ if (isset($_POST['login'])) {
                 ?>
 
                 <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
+                <a href="../login.php" class="btn btn-secondary btn-block">Back</a>
 
                 <?php if($config_client_portal_enable == 1){ ?>
                     <hr>
