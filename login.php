@@ -120,7 +120,7 @@ if ($config_https_only || !isset($config_https_only)) {
         <?php if (!empty($company_logo)) { ?>
             <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
         <?php } else { ?>
-            <b>IT</b>Flow
+            Splash<b>PSA</b>
         <?php } ?>
     </div>
     <div class="card">
