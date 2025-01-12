@@ -173,6 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
                     </div>
 
                     <button type="submit" class="btn btn-success btn-block mb-3" name="login">Sign in</button>
+                    <a href="../login.php" class="btn btn-secondary btn-block">Back</a>
 
                     <hr>
 
