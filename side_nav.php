@@ -3,7 +3,7 @@
 
     <a class="brand-link" href="dashboard.php">
      <div class="brand-image">
-        <img alt="<?=nullable_htmlentities($session_company_name)?> logo" height="50" width="50" class="img-fluid" src="uploads/settings/<?php echo $company_logo; ?>">
+        <img alt="<?=nullable_htmlentities($session_company_name)?> logo" height="100" width="500" class="img-fluid" src="uploads/settings/<?php echo $company_logo; ?>">
 </div>
         
     <!-- Sidebar -->
