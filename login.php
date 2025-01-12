@@ -123,6 +123,8 @@ if ($config_https_only || !isset($config_https_only)) {
             Splash<b>PSA</b>
         <?php } ?>
     </div>
+    <br>
+    <br>
     <div class="card">
         <div class="card-body login-card-body">
             <?php if(!empty($config_login_message)){ ?>
