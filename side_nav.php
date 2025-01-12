@@ -4,7 +4,7 @@
     <a class="brand-link" href="dashboard.php">
       <div class="brand-image">
     <?php if (!empty($company_logo)) { ?>
-        <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "/uploads/settings/$company_logo"; ?>">
+        <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "../uploads/settings/$company_logo"; ?>">
     <?php } else { ?>
         Splash<b>PSA</b>
     <?php } ?>
