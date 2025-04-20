@@ -314,12 +314,13 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
 
 </head>
-<body class="hold-transition login-page" style="min-height: 100vh; background: #f4f6f9; display: flex; align-items: center; justify-content: center; padding-top: 80px;">
+<body class="hold-transition login-page" style="margin: 0; padding: 0; overflow: hidden;">
 
-<div class="container-fluid">
-    <div class="row no-gutters shadow-lg mx-auto" style="width: 100%; max-width: 900px; border-radius: 15px; overflow: hidden;">
+<div class="container-fluid p-0 m-0" style="height: 100vh;">
+    <div class="row no-gutters m-0" style="height: 100%;">
         <!-- Left: Login Form -->
-        <div class="col-md-6 bg-white p-5" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px;">
+        <div class="col-md-6 bg-white d-flex align-items-center justify-content-center">
+            <div class="login-content p-5" style="max-width: 450px;">
             <div class="login-logo mb-4 text-center">
                 <?php if (!empty($company_logo)) { ?>
                     <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
@@ -375,11 +376,12 @@ if (isset($_POST['login'])) {
                     <h5 class="text-center">Looking for the <a href="client">Client Portal?</a></h5>
                 <?php } ?>
             </form>
+            </div>
         </div>
         
         <!-- Right: CKTC and Tagline -->
-        <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white; border-top-right-radius: 15px; border-bottom-right-radius: 15px;">
-            <div>
+        <div class="col-md-6 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white; height: 100%;">
+            <div class="p-5">
                 <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
                 <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
             </div>
