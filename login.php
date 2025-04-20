@@ -314,79 +314,74 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
 
 </head>
-<body class="hold-transition login-page">
+<body class="hold-transition login-page" style="height: 100vh; background: #f4f6f9;">
 
-<div class="d-flex min-vh-100 align-items-center justify-content-center" style="background: #f4f6f9;">
-    <div class="container" style="max-width: 900px;">
-        <div class="row shadow-lg rounded bg-white overflow-hidden">
-            <!-- Left: Login Form -->
-            <div class="col-md-6 p-5 d-flex flex-column justify-content-center" style="background: #fff;">
-                <div class="login-logo mb-4">
-                    <?php if (!empty($company_logo)) { ?>
-                        <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
-                    <?php } else { ?>
-                        <span class="text-primary text-bold"><i class="fas fa-paper-plane mr-2"></i>IT</span>Flow
-                    <?php } ?>
-                </div>
-                <div class="card border-0 shadow-none">
-                    <div class="card-body login-card-body p-0">
-                        <?php if (!empty($config_login_message)){ ?>
-                        <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
-                        <?php } ?>
+<div class="container h-100 d-flex align-items-center justify-content-center">
+    <div class="row no-gutters shadow-lg rounded overflow-hidden" style="width: 100%; max-width: 1000px;">
+        <!-- Left: Login Form -->
+        <div class="col-md-6 bg-white p-5">
+            <div class="login-logo mb-4 text-center">
+                <?php if (!empty($company_logo)) { ?>
+                    <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
+                <?php } else { ?>
+                    <span class="text-primary text-bold"><i class="fas fa-paper-plane mr-2"></i>IT</span>Flow
+                <?php } ?>
+            </div>
+            
+            <?php if (!empty($config_login_message)){ ?>
+            <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
+            <?php } ?>
 
-                        <?php if (isset($response)) { ?>
-                        <p><?php echo $response; ?></p>
-                        <?php } ?>
+            <?php if (isset($response)) { ?>
+            <p><?php echo $response; ?></p>
+            <?php } ?>
 
-                        <form method="post">
-                            <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                                <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?> >
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-envelope"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                                <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-lock"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <?php
-                            if (isset($token_field)) {
-                                echo $token_field;
-                            ?>
-                            <div class="form-group mb-3">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                                    <label class="custom-control-label" for="remember_me">Remember Me</label>
-                                </div>
-                            </div>
-                            <?php
-                            }
-                            ?>
-
-                            <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
-
-                            <?php if($config_client_portal_enable == 1){ ?>
-                                <hr>
-                                <h5 class="text-center">Looking for the <a href="client">Client Portal?<a/></h5>
-                            <?php } ?>
-                        </form>
+            <form method="post">
+                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                    <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?> >
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Right: CKTC and Tagline -->
-            <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #f0f3fa;">
-                <div>
-                    <h1 class="display-4 font-weight-bold mb-3" style="letter-spacing: 2px;">CKTC</h1>
-                    <p class="lead mb-4" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
-                    <!-- You can adjust the tagline above as needed -->
+                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                    <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
                 </div>
+
+                <?php
+                if (isset($token_field)) {
+                    echo $token_field;
+                ?>
+                <div class="form-group mb-3">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
+                        <label class="custom-control-label" for="remember_me">Remember Me</label>
+                    </div>
+                </div>
+                <?php
+                }
+                ?>
+
+                <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
+
+                <?php if($config_client_portal_enable == 1){ ?>
+                    <hr>
+                    <h5 class="text-center">Looking for the <a href="client">Client Portal?</a></h5>
+                <?php } ?>
+            </form>
+        </div>
+        
+        <!-- Right: CKTC and Tagline -->
+        <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white;">
+            <div>
+                <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
+                <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
             </div>
         </div>
     </div>
