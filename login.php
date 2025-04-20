@@ -314,10 +314,10 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
 
 </head>
-<body class="hold-transition login-page" style="height: 100vh; background: #f4f6f9;">
+<body class="hold-transition login-page d-flex align-items-center justify-content-center" style="min-height: 100vh; background: #f4f6f9;">
 
-<div class="container h-100 d-flex align-items-center justify-content-center">
-    <div class="row no-gutters shadow-lg rounded overflow-hidden" style="width: 100%; max-width: 1000px;">
+<div class="container-fluid d-flex align-items-center justify-content-center">
+    <div class="row no-gutters shadow-lg rounded overflow-hidden mx-auto" style="width: 100%; max-width: 900px;">
         <!-- Left: Login Form -->
         <div class="col-md-6 bg-white p-5">
             <div class="login-logo mb-4 text-center">
