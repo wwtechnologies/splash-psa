@@ -314,12 +314,12 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
 
 </head>
-<body class="hold-transition login-page d-flex align-items-center justify-content-center" style="min-height: 100vh; background: #f4f6f9;">
+<body class="hold-transition login-page" style="min-height: 100vh; background: #f4f6f9; display: flex; align-items: center; justify-content: center; padding-top: 80px;">
 
-<div class="container-fluid d-flex align-items-center justify-content-center">
-    <div class="row no-gutters shadow-lg rounded overflow-hidden mx-auto" style="width: 100%; max-width: 900px;">
+<div class="container-fluid">
+    <div class="row no-gutters shadow-lg mx-auto" style="width: 100%; max-width: 900px; border-radius: 15px; overflow: hidden;">
         <!-- Left: Login Form -->
-        <div class="col-md-6 bg-white p-5">
+        <div class="col-md-6 bg-white p-5" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px;">
             <div class="login-logo mb-4 text-center">
                 <?php if (!empty($company_logo)) { ?>
                     <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
@@ -378,7 +378,7 @@ if (isset($_POST['login'])) {
         </div>
         
         <!-- Right: CKTC and Tagline -->
-        <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white;">
+        <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white; border-top-right-radius: 15px; border-bottom-right-radius: 15px;">
             <div>
                 <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
                 <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
