@@ -715,17 +715,17 @@ if (isset($_POST['assign_ticket'])) {
         }
     }
 
-        // Email Notification
-        if (!empty($config_smtp_host)) {
-
+        // Email Notification for primary assignee
+        if ($assigned_to > 0 && !empty($agent_email) && !empty($config_smtp_host)) {
+    
             // Sanitize Config vars from get_settings.php
             $config_ticket_from_name = sanitizeInput($config_ticket_from_name);
             $config_ticket_from_email = sanitizeInput($config_ticket_from_email);
             $company_name = sanitizeInput($session_company_name);
-
+    
             $subject = "$config_app_name - Ticket $ticket_prefix$ticket_number assigned to you - $ticket_subject";
             $body = "Hi $agent_name, <br><br>A ticket has been assigned to you!<br><br>Client: $client_name<br>Ticket Number: $ticket_prefix$ticket_number<br> Subject: $ticket_subject<br><br>https://$config_base_url/ticket.php?ticket_id=$ticket_id <br><br>Thanks, <br>$session_name<br>$company_name";
-
+    
             // Email Ticket Agent
             // Queue Mail
             $data = [
@@ -740,7 +740,6 @@ if (isset($_POST['assign_ticket'])) {
             ];
             addToMailQueue($data);
         }
-    }
 
     customAction('ticket_assign', $ticket_id);
 
