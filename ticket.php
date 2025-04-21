@@ -107,10 +107,36 @@ if (isset($_GET['ticket_id'])) {
         $ticket_closed_by = intval($row['ticket_closed_by']);
 
         $ticket_assigned_to = intval($row['ticket_assigned_to']);
-        if (empty($ticket_assigned_to)) {
+        
+        // Get additional assignees
+        $additional_assignees = array();
+        $additional_assignee_names = array();
+        $sql_additional_assignees = mysqli_query($mysqli, "SELECT ticket_assignees.user_id, users.user_name
+                                                         FROM ticket_assignees
+                                                         LEFT JOIN users ON ticket_assignees.user_id = users.user_id
+                                                         WHERE ticket_id = $ticket_id");
+        while ($assignee_row = mysqli_fetch_array($sql_additional_assignees)) {
+            $additional_assignees[] = intval($assignee_row['user_id']);
+            $additional_assignee_names[] = nullable_htmlentities($assignee_row['user_name']);
+        }
+        
+        // Build display string for assignees
+        if (empty($ticket_assigned_to) && empty($additional_assignees)) {
             $ticket_assigned_to_display = "<span class='text-danger'>Not Assigned</span>";
         } else {
-            $ticket_assigned_to_display = nullable_htmlentities($row['user_name']);
+            $assignee_names = array();
+            
+            // Add primary assignee if set
+            if (!empty($ticket_assigned_to)) {
+                $assignee_names[] = "<strong>" . nullable_htmlentities($row['user_name']) . "</strong> (Primary)";
+            }
+            
+            // Add additional assignees
+            foreach ($additional_assignee_names as $name) {
+                $assignee_names[] = $name;
+            }
+            
+            $ticket_assigned_to_display = implode("<br>", $assignee_names);
         }
 
         // Tab Title // No Sanitizing needed
@@ -495,7 +521,7 @@ if (isset($_GET['ticket_id'])) {
                                 <i class="fa fa-fw fa-clock text-secondary mr-2"></i>Closed at: <?php echo $ticket_closed_at; ?>
                             </div>
                             <div class="mt-1">
-                                <i class="fas fa-fw fa-user mr-2 text-secondary"></i><?php echo $ticket_assigned_to_display; ?>
+                                <i class="fas fa-fw fa-users mr-2 text-secondary"></i><?php echo $ticket_assigned_to_display; ?>
                             </div>
                             <?php if($ticket_feedback) { ?>
                                 <div class="mt-1">
@@ -508,7 +534,7 @@ if (isset($_GET['ticket_id'])) {
                                    data-toggle = "ajax-modal"
                                    data-ajax-url = "ajax/ajax_ticket_assign.php"
                                    data-ajax-id = "<?php echo $ticket_id; ?>">
-                                    <i class="fas fa-fw fa-user mr-2 text-secondary"></i><?php echo $ticket_assigned_to_display; ?>
+                                    <i class="fas fa-fw fa-users mr-2 text-secondary"></i><?php echo $ticket_assigned_to_display; ?>
                                 </a>
                             </div>
                         <?php } ?>

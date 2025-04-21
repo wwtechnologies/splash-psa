@@ -18,6 +18,18 @@ $recurring_ticket_contact_id = intval($row['recurring_ticket_contact_id']);
 $recurring_ticket_asset_id = intval($row['recurring_ticket_asset_id']);
 $recurring_ticket_billable = intval($row['recurring_ticket_billable']);
 
+// Get all assigned users for this recurring ticket
+$assigned_users_array = array();
+$sql_assigned_users = mysqli_query($mysqli, "SELECT user_id FROM recurring_ticket_assignees WHERE recurring_ticket_id = $recurring_ticket_id");
+while ($row = mysqli_fetch_array($sql_assigned_users)) {
+    $assigned_user_id = intval($row['user_id']);
+    $assigned_users_array[] = $assigned_user_id;
+}
+// Add the primary assignee to the array if not already included
+if ($recurring_ticket_assigned_to > 0 && !in_array($recurring_ticket_assigned_to, $assigned_users_array)) {
+    $assigned_users_array[] = $recurring_ticket_assigned_to;
+}
+
 // Additional Assets Selected
 $additional_assets_array = array();
 $sql_additional_assets = mysqli_query($mysqli, "SELECT asset_id FROM recurring_ticket_assets WHERE recurring_ticket_id = $recurring_ticket_id");
@@ -90,13 +102,13 @@ ob_start();
                 </div>
 
                 <div class="form-group">
-                    <label>Assign To</label>
+                    <label>Primary Assignee</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
                         </div>
                         <select class="form-control select2" name="assigned_to">
-                            <option value="0">- Select Agent -</option>
+                            <option value="0">- Select Primary Agent -</option>
                             <?php
                             $sql_users_select = mysqli_query($mysqli, "SELECT user_id, user_name FROM users
                                 WHERE user_type = 1
@@ -109,6 +121,29 @@ ob_start();
 
                                 ?>
                                 <option value="<?php echo $user_id_select; ?>" <?php if ($recurring_ticket_assigned_to == $user_id_select) { echo "selected"; } ?>><?php echo $user_name_select; ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Assignees</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
+                        </div>
+                        <select class="form-control select2" name="additional_assignees[]" multiple data-placeholder="- Select Additional Assignees -">
+                            <?php
+                            $sql_users_select = mysqli_query($mysqli, "SELECT user_id, user_name FROM users
+                                WHERE user_type = 1
+                                AND user_archived_at IS NULL
+                                ORDER BY user_name DESC"
+                            );
+                            while ($row = mysqli_fetch_array($sql_users_select)) {
+                                $user_id_select = intval($row['user_id']);
+                                $user_name_select = nullable_htmlentities($row['user_name']);
+                                ?>
+                                <option value="<?php echo $user_id_select; ?>" <?php if (in_array($user_id_select, $assigned_users_array) && $recurring_ticket_assigned_to != $user_id_select) { echo "selected"; } ?>><?php echo $user_name_select; ?></option>
                             <?php } ?>
                         </select>
                     </div>

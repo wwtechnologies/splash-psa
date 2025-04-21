@@ -603,31 +603,61 @@ if (isset($_POST['assign_ticket'])) {
     $ticket_id = intval($_POST['ticket_id']);
     $assigned_to = intval($_POST['assigned_to']);
     $ticket_status = intval($_POST['ticket_status']);
+    
+    // Process additional assignees
+    $additional_assignees = array();
+    if (isset($_POST['additional_assignees']) && is_array($_POST['additional_assignees'])) {
+        foreach ($_POST['additional_assignees'] as $assignee) {
+            $assignee_id = intval($assignee);
+            if ($assignee_id > 0 && $assignee_id != $assigned_to) {
+                $additional_assignees[] = $assignee_id;
+            }
+        }
+    }
 
     // New > Open as assigned
-    if ($ticket_status == 1 && $assigned_to !== 0) {
+    if ($ticket_status == 1 && ($assigned_to !== 0 || !empty($additional_assignees))) {
         $ticket_status = 2;
     }
 
+    // Build assignee names for notification
+    $assignee_names = array();
+    
     // Allow for un-assigning tickets
-    if ($assigned_to == 0) {
+    if ($assigned_to == 0 && empty($additional_assignees)) {
         $ticket_reply = "Ticket unassigned.";
         $agent_name = "No One";
     } else {
-        // Get & verify assigned agent details
-        $agent_details_sql = mysqli_query($mysqli, "SELECT user_name, user_email FROM users WHERE users.user_id = $assigned_to");
-        $agent_details = mysqli_fetch_array($agent_details_sql);
+        // Get & verify primary assigned agent details if set
+        if ($assigned_to > 0) {
+            $agent_details_sql = mysqli_query($mysqli, "SELECT user_name, user_email FROM users WHERE users.user_id = $assigned_to");
+            $agent_details = mysqli_fetch_array($agent_details_sql);
 
-        $agent_name = sanitizeInput($agent_details['user_name']);
-        $agent_email = sanitizeInput($agent_details['user_email']);
-        $ticket_reply = "Ticket re-assigned to $agent_name.";
+            $agent_name = sanitizeInput($agent_details['user_name']);
+            $agent_email = sanitizeInput($agent_details['user_email']);
+            $assignee_names[] = $agent_name;
 
-        if (!$agent_name) {
-            $_SESSION['alert_type'] = "error";
-            $_SESSION['alert_message'] = "Invalid agent!";
-            header("Location: " . $_SERVER["HTTP_REFERER"]);
-            exit();
+            if (!$agent_name) {
+                $_SESSION['alert_type'] = "error";
+                $_SESSION['alert_message'] = "Invalid primary agent!";
+                header("Location: " . $_SERVER["HTTP_REFERER"]);
+                exit();
+            }
+        } else {
+            $agent_name = "No Primary Agent";
         }
+        
+        // Get additional assignee names
+        if (!empty($additional_assignees)) {
+            $additional_assignee_ids = implode(',', $additional_assignees);
+            $additional_assignees_sql = mysqli_query($mysqli, "SELECT user_name FROM users WHERE user_id IN ($additional_assignee_ids)");
+            while ($additional_agent = mysqli_fetch_array($additional_assignees_sql)) {
+                $assignee_names[] = sanitizeInput($additional_agent['user_name']);
+            }
+        }
+        
+        $assignee_list = implode(', ', $assignee_names);
+        $ticket_reply = "Ticket re-assigned to $assignee_list.";
     }
 
     // Get & verify ticket details
@@ -649,18 +679,36 @@ if (isset($_POST['assign_ticket'])) {
 
     // Update ticket & insert reply
     mysqli_query($mysqli, "UPDATE tickets SET ticket_assigned_to = $assigned_to, ticket_status = '$ticket_status' WHERE ticket_id = $ticket_id");
+    
+    // Update additional assignees
+    mysqli_query($mysqli, "DELETE FROM ticket_assignees WHERE ticket_id = $ticket_id");
+    if (!empty($additional_assignees)) {
+        foreach ($additional_assignees as $assignee_id) {
+            mysqli_query($mysqli, "INSERT INTO ticket_assignees SET ticket_id = $ticket_id, user_id = $assignee_id");
+        }
+    }
 
     mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = '$ticket_reply', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:01:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
 
     // Logging
-    logAction("Ticket", "Edit", "$session_name reassigned $ticket_prefix$ticket_number to $agent_name", $client_id, $ticket_id);
+    logAction("Ticket", "Edit", "$session_name reassigned $ticket_prefix$ticket_number to $assignee_list", $client_id, $ticket_id);
 
-
-    // Notification
+    // Notifications
+    // Primary assignee notification
     if ($session_user_id != $assigned_to && $assigned_to != 0) {
-
         // App Notification
         mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = 'Ticket $ticket_prefix$ticket_number - Subject: $ticket_subject has been assigned to you by $session_name', notification_action = 'ticket.php?ticket_id=$ticket_id', notification_client_id = $client_id, notification_user_id = $assigned_to");
+    }
+    
+    // Additional assignees notifications
+    if (!empty($additional_assignees)) {
+        foreach ($additional_assignees as $assignee_id) {
+            if ($session_user_id != $assignee_id) {
+                // App Notification
+                mysqli_query($mysqli, "INSERT INTO notifications SET notification_type = 'Ticket', notification = 'Ticket $ticket_prefix$ticket_number - Subject: $ticket_subject has been assigned to you by $session_name', notification_action = 'ticket.php?ticket_id=$ticket_id', notification_client_id = $client_id, notification_user_id = $assignee_id");
+            }
+        }
+    }
 
         // Email Notification
         if (!empty($config_smtp_host)) {
@@ -2105,6 +2153,13 @@ if (isset($_POST['add_recurring_ticket'])) {
 
     $recurring_ticket_id = mysqli_insert_id($mysqli);
 
+    // Add Additional Assignees
+    if (!empty($additional_assignees)) {
+        foreach ($additional_assignees as $assignee_id) {
+            mysqli_query($mysqli, "INSERT INTO recurring_ticket_assignees SET recurring_ticket_id = $recurring_ticket_id, user_id = $assignee_id");
+        }
+    }
+
     // Add Additional Assets
     if (isset($_POST['additional_assets'])) {
         foreach ($_POST['additional_assets'] as $additional_asset) {
@@ -2131,6 +2186,14 @@ if (isset($_POST['edit_recurring_ticket'])) {
     $next_run_date = sanitizeInput($_POST['next_date']);
 
     mysqli_query($mysqli, "UPDATE recurring_tickets SET recurring_ticket_subject = '$subject', recurring_ticket_details = '$details', recurring_ticket_priority = '$priority', recurring_ticket_frequency = '$frequency', recurring_ticket_billable = $billable, recurring_ticket_next_run = '$next_run_date', recurring_ticket_assigned_to = $assigned_to, recurring_ticket_asset_id = $asset_id, recurring_ticket_contact_id = $contact_id WHERE recurring_ticket_id = $recurring_ticket_id");
+
+    // Update Additional Assignees
+    mysqli_query($mysqli, "DELETE FROM recurring_ticket_assignees WHERE recurring_ticket_id = $recurring_ticket_id");
+    if (!empty($additional_assignees)) {
+        foreach ($additional_assignees as $assignee_id) {
+            mysqli_query($mysqli, "INSERT INTO recurring_ticket_assignees SET recurring_ticket_id = $recurring_ticket_id, user_id = $assignee_id");
+        }
+    }
 
     // Add Additional Assets
     if (isset($_POST['additional_assets'])) {
@@ -2172,6 +2235,13 @@ if (isset($_GET['force_recurring_ticket'])) {
         $client_id = intval($row['recurring_ticket_client_id']);
         $asset_id = intval($row['recurring_ticket_asset_id']);
         $url_key = randomString(156);
+        
+        // Get additional assignees
+        $additional_assignees = array();
+        $sql_additional_assignees = mysqli_query($mysqli, "SELECT user_id FROM recurring_ticket_assignees WHERE recurring_ticket_id = $recurring_ticket_id");
+        while ($assignee_row = mysqli_fetch_array($sql_additional_assignees)) {
+            $additional_assignees[] = intval($assignee_row['user_id']);
+        }
 
         $ticket_status = 1; // Default
         if ($assigned_id > 0) {
@@ -2192,6 +2262,13 @@ if (isset($_GET['force_recurring_ticket'])) {
         // Raise the ticket
         mysqli_query($mysqli, "INSERT INTO tickets SET ticket_prefix = '$config_ticket_prefix', ticket_number = $ticket_number, ticket_subject = '$subject', ticket_details = '$details', ticket_priority = '$priority', ticket_status = '$ticket_status', ticket_billable = $billable, ticket_url_key = '$url_key', ticket_created_by = $created_id, ticket_assigned_to = $assigned_id, ticket_contact_id = $contact_id, ticket_client_id = $client_id, ticket_asset_id = $asset_id, ticket_recurring_ticket_id = $recurring_ticket_id");
         $id = mysqli_insert_id($mysqli);
+
+        // Add additional assignees to the ticket
+        if (!empty($additional_assignees)) {
+            foreach ($additional_assignees as $assignee_id) {
+                mysqli_query($mysqli, "INSERT INTO ticket_assignees SET ticket_id = $id, user_id = $assignee_id");
+            }
+        }
 
         // Copy Additional Assets from Recurring ticket to new ticket
         mysqli_query($mysqli, "INSERT INTO ticket_assets (ticket_id, asset_id)
