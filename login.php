@@ -371,7 +371,7 @@ if (isset($_POST['login'])) {
                 
                 <?php if($config_client_portal_enable == 1){ ?>
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="client" style="color: #00c853; text-decoration: none;">Looking for the Client Portal?</a>
+                    <a href="client" style="color: #1976d2; text-decoration: none;">Looking for the Client Portal?</a>
                 </div>
                 <?php } ?>
             </div>
