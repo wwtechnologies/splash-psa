@@ -295,17 +295,13 @@ if (isset($_POST['login'])) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><?php echo nullable_htmlentities($company_name); ?> | Login</title>
-    <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
 
-    <!--
-    Favicon
-    If Fav Icon exists else use the default one
-    -->
+    <!-- Favicon -->
     <?php if(file_exists('uploads/favicon.ico')) { ?>
         <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
     <?php } ?>
@@ -314,119 +310,170 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
     
     <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
         body {
-            background-color: #f4f6f9;
+            background-color: var(--background-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            justify-content: center;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
-        .login-container {
-            display: flex;
-            width: 900px;
+        
+        .login-card {
             background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .login-left {
-            flex: 1;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 420px;
             padding: 40px;
-            background: white;
-        }
-        .login-right {
-            flex: 1;
-            padding: 40px;
-            background: #007bff;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             text-align: center;
         }
+        
         .login-logo {
-            text-align: center;
             margin-bottom: 30px;
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+        
+        .login-logo img {
+            max-width: 100%;
+            height: auto;
         }
+        
+        .form-control {
+            height: 50px;
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+        
+        .input-group-text {
+            background-color: transparent;
+            border-left: none;
+        }
+        
+        .btn-primary {
+            height: 50px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
         .btn-primary:hover {
             background-color: #0069d9;
             border-color: #0062cc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 105, 217, 0.2);
+        }
+        
+        .brand-tagline {
+            margin-top: 30px;
+            color: var(--secondary-color);
+        }
+        
+        .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .portal-link {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .portal-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .portal-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- Left: Login Form -->
-        <div class="login-left">
-            <div class="login-logo">
-                <?php if (!empty($company_logo)) { ?>
-                    <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
-                <?php } else { ?>
-                    <span class="text-primary text-bold"><i class="fas fa-paper-plane mr-2"></i>IT</span>Flow
-                <?php } ?>
-            </div>
-            
-            <?php if (!empty($config_login_message)){ ?>
-            <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
+    <div class="login-card">
+        <div class="login-logo">
+            <?php if (!empty($company_logo)) { ?>
+                <img alt="<?=nullable_htmlentities($company_name)?> logo" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
+            <?php } else { ?>
+                <span class="text-primary" style="font-size: 32px;"><i class="fas fa-paper-plane mr-2"></i>IT<span style="font-weight: 700;">Flow</span></span>
             <?php } ?>
-
-            <?php if (isset($response)) { ?>
-            <p><?php echo $response; ?></p>
-            <?php } ?>
-
-            <form method="post">
-                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                    <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?> >
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-envelope"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                    <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <?php
-                if (isset($token_field)) {
-                    echo $token_field;
-                ?>
-                <div class="form-group mb-3">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                        <label class="custom-control-label" for="remember_me">Remember Me</label>
-                    </div>
-                </div>
-                <?php
-                }
-                ?>
-
-                <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
-
-                <?php if($config_client_portal_enable == 1){ ?>
-                    <hr>
-                    <h5 class="text-center">Looking for the <a href="client">Client Portal?</a></h5>
-                <?php } ?>
-            </form>
         </div>
         
-        <!-- Right: CKTC and Tagline -->
-        <div class="login-right">
-            <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
-            <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
+        <?php if (!empty($config_login_message)){ ?>
+        <p class="mb-4"><?php echo nl2br($config_login_message); ?></p>
+        <?php } ?>
+
+        <?php if (isset($response)) { ?>
+        <div class="mb-4"><?php echo $response; ?></div>
+        <?php } ?>
+
+        <form method="post">
+            <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?>>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-envelope text-muted"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-group mb-4" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-lock text-muted"></span>
+                    </div>
+                </div>
+            </div>
+
+            <?php
+            if (isset($token_field)) {
+                echo $token_field;
+            ?>
+            <div class="form-group mb-4">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
+                    <label class="custom-control-label" for="remember_me">Remember Me</label>
+                </div>
+            </div>
+            <?php
+            }
+            ?>
+
+            <button type="submit" class="btn btn-primary btn-block mb-4" name="login">Sign In</button>
+        </form>
+        
+        <div class="brand-tagline">
+            <div class="brand-name">CKTC</div>
+            <p class="text-muted">Your Secure Credential & Knowledge Tracking Companion</p>
         </div>
+        
+        <?php if($config_client_portal_enable == 1){ ?>
+            <div class="portal-link">
+                Looking for the <a href="client">Client Portal?</a>
+            </div>
+        <?php } ?>
     </div>
 
 <!-- jQuery -->
