@@ -311,14 +311,44 @@ if (isset($_POST['login'])) {
     
     <style>
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --background-color: #f8f9fa;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --background-start: #4cc9f0;
+            --background-end: #4361ee;
+            --text-color: #2b2d42;
+            --light-text: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+        
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
         }
         
         body {
-            background-color: var(--background-color);
+            background: linear-gradient(-45deg, var(--background-start), var(--background-end), #3f37c9, #4895ef);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             display: flex;
@@ -326,91 +356,222 @@ if (isset($_POST['login'])) {
             justify-content: center;
             margin: 0;
             padding: 20px;
+            color: var(--text-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            right: -50px;
+            bottom: -50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><rect fill="rgba(255,255,255,0.1)" width="50" height="50"/><rect fill="rgba(255,255,255,0.1)" x="50" y="50" width="50" height="50"/></svg>');
+            background-size: 30px 30px;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
         }
         
         .login-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 420px;
-            padding: 40px;
+            max-width: 450px;
+            padding: 50px 40px;
             text-align: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
         }
         
         .login-logo {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
         }
         
         .login-logo img {
             max-width: 100%;
             height: auto;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
         }
         
         .form-control {
-            height: 50px;
-            border-radius: 8px;
+            height: 55px;
+            border-radius: 12px;
             font-size: 16px;
-            padding: 10px 15px;
-            border: 1px solid #e0e0e0;
+            padding: 10px 20px;
+            border: 2px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.9);
             transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+            background: white;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
         }
         
         .input-group-text {
             background-color: transparent;
-            border-left: none;
+            border: none;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            color: #adb5bd;
+        }
+        
+        .input-group-append {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 5;
         }
         
         .btn-primary {
-            height: 50px;
-            border-radius: 8px;
-            font-size: 16px;
+            height: 55px;
+            border-radius: 12px;
+            font-size: 18px;
             font-weight: 600;
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
             transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
         }
         
         .btn-primary:hover {
-            background-color: #0069d9;
-            border-color: #0062cc;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 105, 217, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
         }
         
         .brand-tagline {
-            margin-top: 30px;
-            color: var(--secondary-color);
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
         }
         
         .brand-name {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .brand-tagline p {
+            color: #6c757d;
+            font-size: 16px;
+            line-height: 1.5;
         }
         
         .portal-link {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 25px;
+            font-size: 15px;
+            color: #6c757d;
         }
         
         .portal-link a {
             color: var(--primary-color);
             text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
         .portal-link a:hover {
-            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+        
+        /* Floating elements in background */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.3));
+            animation: float 6s ease-in-out infinite;
+            z-index: -1;
+            filter: blur(10px);
+        }
+        
+        .shape1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -50px;
+            animation-delay: 2s;
+            background: linear-gradient(45deg, rgba(114, 9, 183, 0.3), rgba(58, 12, 163, 0.3));
+        }
+        
+        .shape3 {
+            width: 150px;
+            height: 150px;
+            bottom: 50%;
+            right: -75px;
+            animation-delay: 4s;
+            background: linear-gradient(45deg, rgba(76, 201, 240, 0.3), rgba(67, 97, 238, 0.3));
         }
     </style>
 </head>
 <body>
+    <!-- Background shapes -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+    
     <div class="login-card">
         <div class="login-logo">
             <?php if (!empty($company_logo)) { ?>
