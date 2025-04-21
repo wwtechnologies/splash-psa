@@ -42,6 +42,9 @@ $sql = mysqli_query($mysqli, "SELECT todos.*,
             <div class="col-md-8">
                 <i class="fas fa-check-square"></i>
                 To-Do List
+                <button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#addTodoModal">
+                    <i class="fas fa-plus"></i> Add To-Do
+                </button>
             </div>
             <div class="col-md-4">
                 <div class="input-group">
