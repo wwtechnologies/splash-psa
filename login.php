@@ -310,331 +310,263 @@ if (isset($_POST['login'])) {
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
     
     <style>
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #7209b7;
-            --background-start: #4cc9f0;
-            --background-end: #4361ee;
-            --text-color: #2b2d42;
-            --light-text: #f8f9fa;
-            --card-bg: rgba(255, 255, 255, 0.9);
-        }
-        
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
-        }
-        
         body {
-            background: linear-gradient(-45deg, var(--background-start), var(--background-end), #3f37c9, #4895ef);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-            position: relative;
+            background-color: #f5f5f5;
+        }
+        
+        .login-container {
+            width: 90%;
+            max-width: 1000px;
+            height: 600px;
+            background-color: white;
+            border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
+            display: flex;
         }
         
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: -50px;
-            right: -50px;
-            bottom: -50px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><rect fill="rgba(255,255,255,0.1)" width="50" height="50"/><rect fill="rgba(255,255,255,0.1)" x="50" y="50" width="50" height="50"/></svg>');
-            background-size: 30px 30px;
-            z-index: 0;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        
-        .login-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 450px;
-            padding: 50px 40px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-            z-index: -1;
-        }
-        
-        .login-logo {
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .login-logo img {
-            max-width: 100%;
-            height: auto;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
-        }
-        
-        .form-control {
-            height: 55px;
-            border-radius: 12px;
-            font-size: 16px;
-            padding: 10px 20px;
-            border: 2px solid rgba(0, 0, 0, 0.05);
-            background: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-            background: white;
-        }
-        
-        .input-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-        
-        .input-group-text {
-            background-color: transparent;
-            border: none;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            color: #adb5bd;
-        }
-        
-        .input-group-append {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            z-index: 5;
-        }
-        
-        .btn-primary {
-            height: 55px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-            position: relative;
-            overflow: hidden;
-            margin-top: 10px;
-            letter-spacing: 0.5px;
-        }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        .login-content {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: all 0.6s ease;
+            display: flex;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
-            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+        .login-form {
+            width: 50%;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-        
-        .brand-tagline {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        .login-image {
+            width: 50%;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 100, 50, 0.7)), url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
             position: relative;
         }
         
-        .brand-name {
+        h1 {
             font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
-            letter-spacing: 1px;
+            color: #333;
         }
         
-        .brand-tagline p {
-            color: #6c757d;
+        p.subtitle {
+            color: #666;
+            margin-bottom: 40px;
             font-size: 16px;
             line-height: 1.5;
         }
         
-        .portal-link {
-            margin-top: 25px;
-            font-size: 15px;
-            color: #6c757d;
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
         }
         
-        .portal-link a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .form-control {
+            width: 100%;
+            height: 50px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-sizing: border-box;
         }
         
-        .portal-link a:hover {
-            color: var(--secondary-color);
+        .form-control:focus {
+            border-color: #00c853;
+            outline: none;
         }
         
-        /* Floating elements in background */
-        .bg-shape {
+        .input-icon {
             position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.3));
-            animation: float 6s ease-in-out infinite;
-            z-index: -1;
-            filter: blur(10px);
+            right: 15px;
+            top: 15px;
+            width: 25px;
+            height: 25px;
+            background-color: #00c853;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
         
-        .shape1 {
-            width: 300px;
-            height: 300px;
-            top: -150px;
-            right: -100px;
-            animation-delay: 0s;
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
         }
         
-        .shape2 {
-            width: 200px;
-            height: 200px;
-            bottom: -100px;
-            left: -50px;
-            animation-delay: 2s;
-            background: linear-gradient(45deg, rgba(114, 9, 183, 0.3), rgba(58, 12, 163, 0.3));
+        .remember-me input {
+            margin-right: 10px;
         }
         
-        .shape3 {
-            width: 150px;
-            height: 150px;
-            bottom: 50%;
-            right: -75px;
-            animation-delay: 4s;
-            background: linear-gradient(45deg, rgba(76, 201, 240, 0.3), rgba(67, 97, 238, 0.3));
+        .btn-login {
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            border: 2px solid #00c853;
+            background-color: transparent;
+            color: #00c853;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .btn-login:hover {
+            background-color: #00c853;
+            color: white;
+        }
+        
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        .login-links a {
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .login-links a:hover {
+            color: #00c853;
+        }
+        
+        .brand-logo {
+            font-size: 80px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-logo span {
+            display: inline-block;
+            border: 4px solid white;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .brand-tagline {
+            font-size: 24px;
+            font-weight: 300;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .login-content {
+                flex-direction: column-reverse;
+            }
+            
+            .login-form, .login-image {
+                width: 100%;
+                padding: 40px;
+            }
+            
+            .login-image {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Background shapes -->
-    <div class="bg-shape shape1"></div>
-    <div class="bg-shape shape2"></div>
-    <div class="bg-shape shape3"></div>
-    
-    <div class="login-card">
-        <div class="login-logo">
-            <?php if (!empty($company_logo)) { ?>
-                <img alt="<?=nullable_htmlentities($company_name)?> logo" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
-            <?php } else { ?>
-                <span class="text-primary" style="font-size: 32px;"><i class="fas fa-paper-plane mr-2"></i>IT<span style="font-weight: 700;">Flow</span></span>
-            <?php } ?>
-        </div>
-        
-        <?php if (!empty($config_login_message)){ ?>
-        <p class="mb-4"><?php echo nl2br($config_login_message); ?></p>
-        <?php } ?>
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-form">
+                <h1>Welcome!</h1>
+                <p class="subtitle">Secure access to your credential & knowledge tracking companion. Login to manage your data.</p>
+                
+                <?php if (!empty($config_login_message)){ ?>
+                <p class="mb-4"><?php echo nl2br($config_login_message); ?></p>
+                <?php } ?>
 
-        <?php if (isset($response)) { ?>
-        <div class="mb-4"><?php echo $response; ?></div>
-        <?php } ?>
-
-        <form method="post">
-            <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?>>
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-envelope text-muted"></span>
+                <?php if (isset($response)) { ?>
+                <div class="mb-4"><?php echo $response; ?></div>
+                <?php } ?>
+                
+                <form method="post">
+                    <div class="form-group" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                        <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?>>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
                     </div>
+                    
+                    <div class="form-group" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                        <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                    
+                    <?php
+                    if (isset($token_field)) {
+                        echo $token_field;
+                    ?>
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    <?php
+                    } else {
+                    ?>
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    
+                    <button type="submit" class="btn-login" name="login">Login</button>
+                    
+                    <div class="login-links">
+                        <a href="#">New User? Sign Up</a>
+                        <a href="#">Forgot Password</a>
+                    </div>
+                </form>
+                
+                <?php if($config_client_portal_enable == 1){ ?>
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="client" style="color: #00c853; text-decoration: none;">Looking for the Client Portal?</a>
                 </div>
+                <?php } ?>
             </div>
             
-            <div class="input-group mb-4" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
-                <div class="input-group-append">
-                    <div class="input-group-text">
-                        <span class="fas fa-lock text-muted"></span>
-                    </div>
+            <div class="login-image">
+                <div class="brand-logo">
+                    <span>CKTC</span>
+                </div>
+                <div class="brand-tagline">
+                    Your Secure Credential & Knowledge Tracking Companion
                 </div>
             </div>
-
-            <?php
-            if (isset($token_field)) {
-                echo $token_field;
-            ?>
-            <div class="form-group mb-4">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                    <label class="custom-control-label" for="remember_me">Remember Me</label>
-                </div>
-            </div>
-            <?php
-            }
-            ?>
-
-            <button type="submit" class="btn btn-primary btn-block mb-4" name="login">Sign In</button>
-        </form>
-        
-        <div class="brand-tagline">
-            <div class="brand-name">CKTC</div>
-            <p class="text-muted">Your Secure Credential & Knowledge Tracking Companion</p>
         </div>
-        
-        <?php if($config_client_portal_enable == 1){ ?>
-            <div class="portal-link">
-                Looking for the <a href="client">Client Portal?</a>
-            </div>
-        <?php } ?>
     </div>
 
 <!-- jQuery -->
