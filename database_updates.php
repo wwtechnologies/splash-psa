@@ -3457,11 +3457,41 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
         mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.3'");
     }
 
-    // if (CURRENT_DATABASE_VERSION == '2.1.3') {
-    //     // Insert queries here required to update to DB version 2.1.4
-    //     // Then, update the database to the next sequential version
-    //     mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.4'");
-    // }
+    if (CURRENT_DATABASE_VERSION == '2.1.3') {
+        // Create recurring_ticket_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `recurring_ticket_assignees` (
+          `recurring_ticket_id` int(11) NOT NULL,
+          `user_id` int(11) NOT NULL,
+          PRIMARY KEY (`recurring_ticket_id`,`user_id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `recurring_ticket_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+          CONSTRAINT `recurring_ticket_assignees_ibfk_2` FOREIGN KEY (`recurring_ticket_id`) REFERENCES `recurring_tickets` (`recurring_ticket_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        // Create ticket_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `ticket_assignees` (
+          `ticket_id` int(11) NOT NULL,
+          `user_id` int(11) NOT NULL,
+          PRIMARY KEY (`ticket_id`,`user_id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `ticket_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+          CONSTRAINT `ticket_assignees_ibfk_2` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        // Migrate existing data - copy primary assignees to the new tables
+        mysqli_query($mysqli, "INSERT IGNORE INTO recurring_ticket_assignees (recurring_ticket_id, user_id)
+        SELECT recurring_ticket_id, recurring_ticket_assigned_to
+        FROM recurring_tickets
+        WHERE recurring_ticket_assigned_to > 0");
+
+        mysqli_query($mysqli, "INSERT IGNORE INTO ticket_assignees (ticket_id, user_id)
+        SELECT ticket_id, ticket_assigned_to
+        FROM tickets
+        WHERE ticket_assigned_to > 0");
+
+        // Then, update the database to the next sequential version
+        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.4'");
+    }
 
 } else {
     // Up-to-date
