@@ -12,13 +12,14 @@ if (isset($_POST['add_task'])) {
 
     $ticket_id = intval($_POST['ticket_id']);
     $task_name = sanitizeInput($_POST['name']);
+    $task_completion_estimate = isset($_POST['estimate']) ? intval($_POST['estimate']) : 15; // Default to 15 minutes if not specified
 
     // Get Client ID from tickets using the ticket_id
     $sql = mysqli_query($mysqli, "SELECT * FROM tickets WHERE ticket_id = $ticket_id");
     $row = mysqli_fetch_array($sql);
     $client_id = intval($row['ticket_client_id']);
     
-    mysqli_query($mysqli, "INSERT INTO tasks SET task_name = '$task_name', task_ticket_id = $ticket_id");
+    mysqli_query($mysqli, "INSERT INTO tasks SET task_name = '$task_name', task_completion_estimate = $task_completion_estimate, task_ticket_id = $ticket_id");
 
     $task_id = mysqli_insert_id($mysqli);
 

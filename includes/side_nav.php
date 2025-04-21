@@ -46,6 +46,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="todos.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "todos.php") { echo "active"; } ?>">
+                                <i class="nav-icon fas fa-check-square"></i>
+                                <p>To-Do List</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="recurring_tickets.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "recurring_tickets.php") { echo "active"; } ?>">
                                 <i class="nav-icon fas fa-redo-alt"></i>
                                 <p>

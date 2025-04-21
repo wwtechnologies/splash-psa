@@ -16,6 +16,25 @@ if (!defined("LATEST_DATABASE_VERSION") || !defined("CURRENT_DATABASE_VERSION") 
 if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
 
     // We need updates!
+    
+    // Add todos table for version 2.1.5
+    if (CURRENT_DATABASE_VERSION == '2.1.4') {
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todos` (
+            `todo_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `todo_name` VARCHAR(255) NOT NULL,
+            `todo_description` TEXT,
+            `todo_created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `todo_created_by` INT(11) NOT NULL,
+            `todo_completed_at` DATETIME DEFAULT NULL,
+            `todo_completed_by` INT(11) DEFAULT NULL,
+            `todo_due_date` DATE DEFAULT NULL,
+            `todo_priority` VARCHAR(20) DEFAULT 'Medium',
+            PRIMARY KEY (`todo_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        
+        // Update the database version
+        mysqli_query($mysqli, "UPDATE settings SET config_database_version = '2.1.5' WHERE company_id = 1");
+    }
 
     if (CURRENT_DATABASE_VERSION == '0.2.0') {
         //Insert queries here required to update to DB version 0.2.1
