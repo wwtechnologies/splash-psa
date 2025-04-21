@@ -33,7 +33,7 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         
         // Update the database version
-        mysqli_query($mysqli, "UPDATE settings SET config_database_version = '2.1.5' WHERE company_id = 1");
+        mysqli_query($mysqli, "UPDATE settings SET config_current_database_version = '2.1.5' WHERE company_id = 1");
     }
 
     if (CURRENT_DATABASE_VERSION == '0.2.0') {
