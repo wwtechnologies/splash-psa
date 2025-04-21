@@ -316,7 +316,7 @@ if (isset($_POST['login'])) {
     <div class="login-container">
         <div class="login-content">
             <div class="login-form">
-                <h1>Welcome to CKTC</h1>
+                <h1>Welcome</h1>
                 <p class="subtitle">Secure access to your IT documentation and asset management portal. Login to manage your infrastructure.</p>
                 
                 <?php if (!empty($config_login_message)){ ?>
@@ -378,7 +378,7 @@ if (isset($_POST['login'])) {
             
             <div class="login-image">
                 <div class="brand-logo">
-                    <span>CKTC</span>
+                    <img src="assets/logo/cktc logo.png" alt="<?php echo nullable_htmlentities($company_name); ?> Logo" class="logo-img">
                 </div>
                 <div class="brand-tagline">
                     Comprehensive IT Documentation & Asset Management Portal
