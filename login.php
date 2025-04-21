@@ -312,16 +312,60 @@ if (isset($_POST['login'])) {
 
     <!-- Theme style -->
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
-
+    
+    <style>
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            display: flex;
+            width: 900px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .login-left {
+            flex: 1;
+            padding: 40px;
+            background: white;
+        }
+        .login-right {
+            flex: 1;
+            padding: 40px;
+            background: #007bff;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+    </style>
 </head>
-<body class="hold-transition login-page" style="margin: 0; padding: 0; overflow: hidden;">
-
-<div class="container-fluid p-0 m-0" style="height: 100vh;">
-    <div class="row no-gutters m-0" style="height: 100%;">
+<body>
+    <div class="login-container">
         <!-- Left: Login Form -->
-        <div class="col-md-6 bg-white d-flex align-items-center justify-content-center">
-            <div class="login-content p-5" style="max-width: 450px;">
-            <div class="login-logo mb-4 text-center">
+        <div class="login-left">
+            <div class="login-logo">
                 <?php if (!empty($company_logo)) { ?>
                     <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
                 <?php } else { ?>
@@ -376,18 +420,14 @@ if (isset($_POST['login'])) {
                     <h5 class="text-center">Looking for the <a href="client">Client Portal?</a></h5>
                 <?php } ?>
             </form>
-            </div>
         </div>
         
         <!-- Right: CKTC and Tagline -->
-        <div class="col-md-6 d-flex flex-column justify-content-center align-items-center text-center" style="background: #007bff; color: white; height: 100%;">
-            <div class="p-5">
-                <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
-                <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
-            </div>
+        <div class="login-right">
+            <h1 class="display-4 font-weight-bold mb-4" style="letter-spacing: 2px;">CKTC</h1>
+            <p class="lead" style="font-size: 1.25rem;">Your Secure Credential & Knowledge Tracking Companion</p>
         </div>
     </div>
-</div>
 
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
