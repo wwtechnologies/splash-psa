@@ -32,8 +32,11 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
             PRIMARY KEY (`todo_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        // Then, update the database to the next sequential version
-        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.5'");
+        // Update both database and app versions
+        mysqli_query($mysqli, "UPDATE `settings` SET
+            `config_current_database_version` = '2.1.5',
+            `config_current_app_version` = '2.1.5'
+        ");
     }
 
     if (CURRENT_DATABASE_VERSION == '0.2.0') {
