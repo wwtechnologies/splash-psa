@@ -648,9 +648,17 @@ if ($user_config_dashboard_technical_enable == 1) {
 
     <?php
     // Get user's to-do items
-    $sql_your_todos = mysqli_query($mysqli, "SELECT * FROM todos
-                                           WHERE todo_created_by = $session_user_id
+    $sql_your_todos = mysqli_query($mysqli, "SELECT DISTINCT todos.*,
+                                           CONCAT(users.user_name) AS created_by_name,
+                                           GROUP_CONCAT(DISTINCT assigned_users.user_name SEPARATOR ', ') as assigned_users
+                                           FROM todos
+                                           LEFT JOIN users ON todos.todo_created_by = users.user_id
+                                           LEFT JOIN todo_assignments ta ON todos.todo_id = ta.todo_id
+                                           LEFT JOIN users AS assigned_users ON ta.user_id = assigned_users.user_id
+                                           WHERE (todos.todo_created_by = $session_user_id
+                                              OR ta.user_id = $session_user_id)
                                            AND todo_completed_at IS NULL
+                                           GROUP BY todos.todo_id
                                            ORDER BY
                                              CASE
                                                WHEN todo_priority = 'High' THEN 1
@@ -692,7 +700,8 @@ if ($user_config_dashboard_technical_enable == 1) {
                                     <th>Description</th>
                                     <th>Priority</th>
                                     <th>Due Date</th>
-                                    <th>Created</th>
+                                    <th>Created By</th>
+                                    <th>Assigned To</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -734,7 +743,8 @@ if ($user_config_dashboard_technical_enable == 1) {
                                         <td><?php echo $todo_description ? substr($todo_description, 0, 50) . (strlen($todo_description) > 50 ? '...' : '') : '-'; ?></td>
                                         <td><?php echo $priority_badge; ?></td>
                                         <td class="<?php echo $due_date_class; ?>"><?php echo $due_date_formatted; ?></td>
-                                        <td><?php echo $todo_created_at_time_ago; ?></td>
+                                        <td><?php echo $row['created_by_name']; ?></td>
+                                        <td><?php echo $row['assigned_users'] ? $row['assigned_users'] : '-'; ?></td>
                                         <td>
                                             <a href="post.php?complete_todo=<?php echo $todo_id; ?>" class="btn btn-sm btn-success" title="Mark Complete"><i class="fas fa-check"></i></a>
                                         </td>

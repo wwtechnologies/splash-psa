@@ -32,6 +32,16 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
             PRIMARY KEY (`todo_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
+        // Create todo assignments table
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todo_assignments` (
+            `todo_id` int(11) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            PRIMARY KEY (`todo_id`,`user_id`),
+            KEY `user_id` (`user_id`),
+            CONSTRAINT `todo_assignments_ibfk_1` FOREIGN KEY (`todo_id`) REFERENCES `todos` (`todo_id`) ON DELETE CASCADE,
+            CONSTRAINT `todo_assignments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
         // Add app version column if it doesn't exist
         mysqli_query($mysqli, "ALTER TABLE `settings`
             ADD COLUMN IF NOT EXISTS `config_current_app_version` VARCHAR(20) NOT NULL DEFAULT '2.1.5'");

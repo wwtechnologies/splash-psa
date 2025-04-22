@@ -4,20 +4,26 @@ require_once '../includes/ajax_header.php';
 
 $todo_id = intval($_GET['id']);
 
-$sql = mysqli_query($mysqli, "SELECT * FROM todos
-    WHERE todo_id = $todo_id
-    LIMIT 1"
-);
-
+// Get current todo details
+$sql = mysqli_query($mysqli, "SELECT * FROM todos WHERE todo_id = $todo_id LIMIT 1");
 $row = mysqli_fetch_array($sql);
 $todo_name = nullable_htmlentities($row['todo_name']);
 $todo_description = nullable_htmlentities($row['todo_description']);
 $todo_priority = nullable_htmlentities($row['todo_priority']);
 $todo_due_date = nullable_htmlentities($row['todo_due_date']);
 
+// Get current assignments
+$sql_assignments = mysqli_query($mysqli, "SELECT user_id FROM todo_assignments WHERE todo_id = $todo_id");
+$assigned_users = array();
+while ($assignment = mysqli_fetch_array($sql_assignments)) {
+    $assigned_users[] = $assignment['user_id'];
+}
+
+// Get list of all users
+$sql_users = mysqli_query($mysqli, "SELECT * FROM users ORDER BY user_name ASC");
+
 // Generate the HTML form content using output buffering.
 ob_start();
-
 ?>
 
 <div class="modal-header">
@@ -30,7 +36,6 @@ ob_start();
     <input type="hidden" name="todo_id" value="<?php echo $todo_id; ?>">
     
     <div class="modal-body bg-white">
-
         <div class="form-group">
             <label>Name <strong class="text-danger">*</strong></label>
             <div class="input-group">
@@ -74,16 +79,27 @@ ob_start();
                 <input type="date" class="form-control" name="due_date" value="<?php echo $todo_due_date; ?>">
             </div>
         </div>
-    
+
+        <div class="form-group">
+            <label>Assign To</label>
+            <select class="form-control select2" name="assigned_to[]" multiple>
+                <?php
+                while ($row = mysqli_fetch_array($sql_users)) {
+                    $user_id = intval($row['user_id']);
+                    $user_name = nullable_htmlentities($row['user_name']);
+                    $selected = in_array($user_id, $assigned_users) ? "selected" : "";
+                    echo "<option value='$user_id' $selected>$user_name</option>";
+                }
+                ?>
+            </select>
+        </div>
     </div>
 
     <div class="modal-footer bg-white">
         <button type="submit" name="edit_todo" class="btn btn-primary text-bold"><i class="fa fa-check mr-2"></i>Save</button>
         <button type="button" class="btn btn-light" data-dismiss="modal"><i class="fa fa-times mr-2"></i>Cancel</button>
     </div>
-
 </form>
 
 <?php
-
 require_once "../includes/ajax_footer.php";

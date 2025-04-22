@@ -5,14 +5,23 @@ require_once "includes/inc_all.php";
 // Perms
 enforceUserPermission('module_support');
 
+// Get list of users for assignment
+$sql_users = mysqli_query($mysqli, "SELECT * FROM users ORDER BY user_name ASC");
+
 // Get todos
-$sql = mysqli_query($mysqli, "SELECT todos.*, 
+$sql = mysqli_query($mysqli, "SELECT DISTINCT todos.*,
                              CONCAT(users.user_name) AS created_by_name,
-                             CONCAT(completed_users.user_name) AS completed_by_name
-                             FROM todos 
+                             CONCAT(completed_users.user_name) AS completed_by_name,
+                             GROUP_CONCAT(DISTINCT assigned_users.user_name SEPARATOR ', ') as assigned_users
+                             FROM todos
                              LEFT JOIN users ON todos.todo_created_by = users.user_id
                              LEFT JOIN users AS completed_users ON todos.todo_completed_by = completed_users.user_id
-                             ORDER BY todos.todo_completed_at ASC, 
+                             LEFT JOIN todo_assignments ta ON todos.todo_id = ta.todo_id
+                             LEFT JOIN users AS assigned_users ON ta.user_id = assigned_users.user_id
+                             WHERE todos.todo_created_by = $session_user_id
+                                OR ta.user_id = $session_user_id
+                             GROUP BY todos.todo_id
+                             ORDER BY todos.todo_completed_at ASC,
                                       CASE 
                                         WHEN todos.todo_priority = 'High' THEN 1
                                         WHEN todos.todo_priority = 'Medium' THEN 2
@@ -93,6 +102,7 @@ $sql = mysqli_query($mysqli, "SELECT todos.*,
                         <th>Priority</th>
                         <th>Due Date</th>
                         <th>Created By</th>
+                        <th>Assigned To</th>
                         <th>Created At</th>
                         <th>Actions</th>
                     </tr>
@@ -168,6 +178,7 @@ $sql = mysqli_query($mysqli, "SELECT todos.*,
                         echo "<td>$priority_badge</td>";
                         echo "<td class='$due_date_class'>$due_date_formatted</td>";
                         echo "<td>$todo_created_by_name</td>";
+                        echo "<td>" . ($row['assigned_users'] ? $row['assigned_users'] : '-') . "</td>";
                         echo "<td>$created_at_formatted</td>";
                         echo "<td>$todo_actions</td>";
                         echo "</tr>";
@@ -210,6 +221,18 @@ $sql = mysqli_query($mysqli, "SELECT todos.*,
                     <div class="form-group">
                         <label for="due_date">Due Date</label>
                         <input type="date" class="form-control" name="due_date" id="due_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Assign To</label>
+                        <select class="form-control select2" name="assigned_to[]" multiple>
+                            <?php
+                            while ($row = mysqli_fetch_array($sql_users)) {
+                                $user_id = intval($row['user_id']);
+                                $user_name = nullable_htmlentities($row['user_name']);
+                                echo "<option value='$user_id'>$user_name</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                     <button type="submit" name="add_todo" class="btn btn-primary">Add To-Do</button>
                 </form>

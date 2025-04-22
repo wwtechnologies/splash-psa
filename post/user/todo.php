@@ -21,14 +21,22 @@ if (isset($_POST['add_todo'])) {
         $due_date_sql = "'$todo_due_date'";
     }
 
-    mysqli_query($mysqli, "INSERT INTO todos SET 
-        todo_name = '$todo_name', 
-        todo_description = '$todo_description', 
-        todo_priority = '$todo_priority', 
-        todo_due_date = $due_date_sql, 
+    mysqli_query($mysqli, "INSERT INTO todos SET
+        todo_name = '$todo_name',
+        todo_description = '$todo_description',
+        todo_priority = '$todo_priority',
+        todo_due_date = $due_date_sql,
         todo_created_by = $session_user_id");
 
     $todo_id = mysqli_insert_id($mysqli);
+
+    // Add assignments if any were selected
+    if (isset($_POST['assigned_to']) && is_array($_POST['assigned_to'])) {
+        foreach ($_POST['assigned_to'] as $user_id) {
+            $user_id = intval($user_id);
+            mysqli_query($mysqli, "INSERT INTO todo_assignments SET todo_id = $todo_id, user_id = $user_id");
+        }
+    }
 
     // Logging
     logAction("Todo", "Create", "$session_name created todo $todo_name");
@@ -54,12 +62,30 @@ if (isset($_POST['edit_todo'])) {
         $due_date_sql = "'$todo_due_date'";
     }
 
-    mysqli_query($mysqli, "UPDATE todos SET 
-        todo_name = '$todo_name', 
-        todo_description = '$todo_description', 
-        todo_priority = '$todo_priority', 
-        todo_due_date = $due_date_sql 
-        WHERE todo_id = $todo_id");
+    mysqli_query($mysqli, "UPDATE todos SET
+        todo_name = '$todo_name',
+        todo_description = '$todo_description',
+        todo_priority = '$todo_priority',
+        todo_due_date = $due_date_sql
+        WHERE todo_id = $todo_id
+        AND (todo_created_by = $session_user_id
+             OR EXISTS (SELECT 1 FROM todo_assignments
+                       WHERE todo_id = $todo_id
+                       AND user_id = $session_user_id))");
+
+    // Update assignments
+    if ($mysqli->affected_rows > 0) {
+        // Remove old assignments
+        mysqli_query($mysqli, "DELETE FROM todo_assignments WHERE todo_id = $todo_id");
+
+        // Add new assignments
+        if (isset($_POST['assigned_to']) && is_array($_POST['assigned_to'])) {
+            foreach ($_POST['assigned_to'] as $user_id) {
+                $user_id = intval($user_id);
+                mysqli_query($mysqli, "INSERT INTO todo_assignments SET todo_id = $todo_id, user_id = $user_id");
+            }
+        }
+    }
 
     // Logging
     logAction("Todo", "Edit", "$session_name edited todo $todo_name");
@@ -80,7 +106,13 @@ if (isset($_GET['delete_todo'])) {
     $row = mysqli_fetch_array($sql);
     $todo_name = sanitizeInput($row['todo_name']);
 
-    mysqli_query($mysqli, "DELETE FROM todos WHERE todo_id = $todo_id");
+    // Only allow delete if user created the todo or is assigned to it
+    mysqli_query($mysqli, "DELETE FROM todos
+        WHERE todo_id = $todo_id
+        AND (todo_created_by = $session_user_id
+             OR EXISTS (SELECT 1 FROM todo_assignments
+                       WHERE todo_id = $todo_id
+                       AND user_id = $session_user_id))");
 
     // Logging
     logAction("Todo", "Delete", "$session_name deleted todo $todo_name");
@@ -102,7 +134,13 @@ if (isset($_GET['complete_todo'])) {
     $row = mysqli_fetch_array($sql);
     $todo_name = sanitizeInput($row['todo_name']);
 
-    mysqli_query($mysqli, "UPDATE todos SET todo_completed_at = NOW(), todo_completed_by = $session_user_id WHERE todo_id = $todo_id");
+    // Only allow completion if user created the todo or is assigned to it
+    mysqli_query($mysqli, "UPDATE todos SET todo_completed_at = NOW(), todo_completed_by = $session_user_id
+        WHERE todo_id = $todo_id
+        AND (todo_created_by = $session_user_id
+             OR EXISTS (SELECT 1 FROM todo_assignments
+                       WHERE todo_id = $todo_id
+                       AND user_id = $session_user_id))");
 
     // Logging
     logAction("Todo", "Complete", "$session_name completed todo $todo_name");
@@ -123,7 +161,13 @@ if (isset($_GET['undo_complete_todo'])) {
     $row = mysqli_fetch_array($sql);
     $todo_name = sanitizeInput($row['todo_name']);
 
-    mysqli_query($mysqli, "UPDATE todos SET todo_completed_at = NULL, todo_completed_by = NULL WHERE todo_id = $todo_id");
+    // Only allow un-completion if user created the todo or is assigned to it
+    mysqli_query($mysqli, "UPDATE todos SET todo_completed_at = NULL, todo_completed_by = NULL
+        WHERE todo_id = $todo_id
+        AND (todo_created_by = $session_user_id
+             OR EXISTS (SELECT 1 FROM todo_assignments
+                       WHERE todo_id = $todo_id
+                       AND user_id = $session_user_id))");
 
     // Logging
     logAction("Todo", "Undo Complete", "$session_name marked todo $todo_name as incomplete");
