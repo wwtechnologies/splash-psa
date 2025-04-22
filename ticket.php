@@ -336,7 +336,14 @@ if (isset($_GET['ticket_id'])) {
 
 
         // Get Tasks
-        $sql_tasks = mysqli_query( $mysqli, "SELECT * FROM tasks WHERE task_ticket_id = $ticket_id ORDER BY task_order ASC, task_id ASC");
+        $sql_tasks = mysqli_query($mysqli, "SELECT tasks.*,
+            GROUP_CONCAT(users.user_name ORDER BY users.user_name ASC SEPARATOR ', ') as assignee_names
+            FROM tasks
+            LEFT JOIN task_assignees ON tasks.task_id = task_assignees.todo_id
+            LEFT JOIN users ON task_assignees.user_id = users.user_id
+            WHERE task_ticket_id = $ticket_id
+            GROUP BY tasks.task_id
+            ORDER BY task_order ASC, task_id ASC");
         $task_count = mysqli_num_rows($sql_tasks);
 
         // Get Completed Task Count
@@ -988,6 +995,12 @@ if (isset($_GET['ticket_id'])) {
                                         <a href="#" class="drag-handle"><i class="fas fa-bars text-muted mr-1"></i></a>
                                         <span class="text-secondary"><?php echo $task_completion_estimate; ?>m</span>
                                         <span class="text-dark"> - <?php echo $task_name; ?></span>
+                                        <?php
+                                        $assignee_names = nullable_htmlentities($row['assignee_names']);
+                                        if ($assignee_names) {
+                                            echo "<br><small class='text-muted'><i class='fas fa-fw fa-users mr-1'></i>$assignee_names</small>";
+                                        }
+                                        ?>
                                     </td>
                                     <td>
                                         <div class="float-right">
@@ -1004,6 +1017,13 @@ if (isset($_GET['ticket_id'])) {
                                                            data-ajax-id = "<?php echo $task_id; ?>"
                                                         >
                                                             <i class="fas fa-fw fa-edit mr-2"></i>Edit
+                                                        </a>
+                                                        <a class="dropdown-item" href="#"
+                                                            data-toggle = "ajax-modal"
+                                                            data-ajax-url = "ajax/ajax_task_assign.php"
+                                                            data-ajax-id = "<?php echo $task_id; ?>"
+                                                        >
+                                                            <i class="fas fa-fw fa-user-check mr-2"></i>Assign
                                                         </a>
                                                         <?php if ($task_completed_at) { ?>
                                                             <a class="dropdown-item" href="post.php?undo_complete_task=<?php echo $task_id; ?>">
