@@ -73,8 +73,15 @@ if (isset($_POST['edit_todo'])) {
                        WHERE todo_id = $todo_id
                        AND user_id = $session_user_id))");
 
-    // Update assignments
-    if ($mysqli->affected_rows > 0) {
+    // Check if user has permission to edit this todo
+    $sql = mysqli_query($mysqli, "SELECT 1 FROM todos
+        WHERE todo_id = $todo_id
+        AND (todo_created_by = $session_user_id
+             OR EXISTS (SELECT 1 FROM todo_assignments
+                       WHERE todo_id = $todo_id
+                       AND user_id = $session_user_id))");
+
+    if (mysqli_num_rows($sql) > 0) {
         // Remove old assignments
         mysqli_query($mysqli, "DELETE FROM todo_assignments WHERE todo_id = $todo_id");
 
