@@ -15,7 +15,8 @@ fputcsv($output, [
     'OS',
     'Assigned To',
     'Location',
-    'Physical Location'
+    'Physical Location',
+    'IP'
 ]);
 
 // Optionally, add a sample row
@@ -29,7 +30,8 @@ fputcsv($output, [
     'Windows 11 Pro',
     'John Doe',
     'Main Office',
-    'HQ Storage'
+    'HQ Storage',
+    '192.168.1.10'
 ]);
 
 fclose($output);
