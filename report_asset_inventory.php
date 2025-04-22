@@ -1,6 +1,10 @@
 <?php
 
-require_once "inc_all.php";
+require_once "includes/inc_all_reports.php";
+
+//Declare arrays needed for the page
+require_once "includes/config_asset_types_array.php";
+require_once "includes/config_asset_status_array.php";
 
 //Initialize variables
 $client_id = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
@@ -125,7 +129,7 @@ $sql = mysqli_query($mysqli,"SELECT * FROM assets
                     $device_icon = getAssetIcon($asset_type);
                 ?>
                     <tr>
-                        <td><a href="asset_details.php?asset_id=<?php echo $asset_id; ?>"><i class="fas fa-fw fa-<?php echo $device_icon; ?> mr-2"></i><?php echo $asset_name; ?></a></td>
+                        <td><a href="asset_details.php?client_id=<?php echo intval($row['asset_client_id']); ?>&asset_id=<?php echo $asset_id; ?>"><i class="fas fa-fw fa-<?php echo $device_icon; ?> mr-2"></i><?php echo $asset_name; ?></a></td>
                         <td><?php echo $client_name; ?></td>
                         <td><?php echo $asset_type; ?></td>
                         <td><?php echo $asset_status; ?></td>
