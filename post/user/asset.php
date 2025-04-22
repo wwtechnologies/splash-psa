@@ -805,7 +805,7 @@ if (isset($_POST["import_assets_csv"])) {
     //(Else)Check column count (name, desc, type, make, model, serial, os, assigned to, location)
     $f = fopen($file_name, "r");
     $f_columns = fgetcsv($f, 1000, ",");
-    if (!$error & count($f_columns) != 10) {
+    if (!$error & count($f_columns) != 11) {
         $error = true;
         $_SESSION['alert_message'] = "Invalid column count.";
     }
@@ -866,6 +866,10 @@ if (isset($_POST["import_assets_csv"])) {
             if (!empty($column[9])) {
                 $physical_location = sanitizeInput($column[9]);
             }
+            $ip = '';
+            if (!empty($column[10])) {
+                $ip = sanitizeInput($column[10]);
+            }
 
             // Check if duplicate was detected
             if ($duplicate_detect == 0) {
@@ -875,7 +879,7 @@ if (isset($_POST["import_assets_csv"])) {
                 $asset_id = mysqli_insert_id($mysqli);
                 
                 // Add Primary Interface
-                mysqli_query($mysqli,"INSERT INTO asset_interfaces SET interface_name = '1', interface_primary = 1, interface_asset_id = $asset_id");
+                mysqli_query($mysqli,"INSERT INTO asset_interfaces SET interface_name = '1', interface_primary = 1, interface_ip = '$ip', interface_asset_id = $asset_id");
 
                 $row_count = $row_count + 1;
             } else {
