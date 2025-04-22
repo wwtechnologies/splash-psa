@@ -17,6 +17,20 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
 
     // We need updates!
 
+    if (CURRENT_DATABASE_VERSION == '2.1.7') {
+        // Create task_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `task_assignees` (
+            `todo_id` int(11) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            PRIMARY KEY (`todo_id`,`user_id`),
+            KEY `user_id` (`user_id`),
+            CONSTRAINT `task_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+            CONSTRAINT `task_assignees_ibfk_2` FOREIGN KEY (`todo_id`) REFERENCES `todos` (`todo_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+
+        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.8'");
+    }
+
     if (CURRENT_DATABASE_VERSION == '2.1.5') {
         // Create todos table
         mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todos` (
