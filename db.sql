@@ -251,6 +251,7 @@ CREATE TABLE `assets` (
   `asset_make` varchar(200) NOT NULL,
   `asset_model` varchar(200) DEFAULT NULL,
   `asset_serial` varchar(200) DEFAULT NULL,
+  `asset_inventory_barcode` varchar(200) DEFAULT NULL,
   `asset_os` varchar(200) DEFAULT NULL,
   `asset_uri` varchar(500) DEFAULT NULL,
   `asset_uri_2` varchar(500) DEFAULT NULL,

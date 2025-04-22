@@ -3528,3 +3528,13 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
     // Up-to-date
 }
 
+
+if (CURRENT_DATABASE_VERSION == '2.1.6') {
+        // Add inventory_barcode field to assets table
+        mysqli_query($mysqli, "ALTER TABLE `assets` ADD `asset_inventory_barcode` varchar(200) DEFAULT NULL AFTER `asset_serial`");
+
+        // Update database version
+        mysqli_query($mysqli, "UPDATE `settings` SET
+            `config_current_database_version` = '2.1.7',
+            `config_current_app_version` = '2.1.7'");
+    }

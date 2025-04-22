@@ -133,6 +133,16 @@
                                         <input type="text" class="form-control" name="serial" placeholder="Serial number" maxlength="200">
                                     </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Inventory Barcode</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-fw fa-barcode"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" name="inventory_barcode" placeholder="Inventory barcode" maxlength="200">
+                                    </div>
+                                </div>
                             <?php } ?>
 
                             <?php if ($_GET['type'] !== 'network' && $_GET['type'] !== 'other') { ?>
