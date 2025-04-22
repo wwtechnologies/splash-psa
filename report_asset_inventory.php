@@ -1,10 +1,16 @@
 <?php
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once "includes/inc_all_reports.php";
 
-//Declare arrays needed for the page
-require_once "includes/config_asset_types_array.php";
-require_once "includes/config_asset_status_array.php";
+// Ensure user has support module access since this is an asset report
+enforceUserPermission('module_support');
+
+//Get the asset type and status arrays
+require_once "includes/get_settings.php";
 
 //Initialize variables
 $client_id = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
@@ -29,14 +35,17 @@ if (!empty($where_array)) {
     $where = 'WHERE ' . implode(' AND ', $where_array);
 }
 
-$sql = mysqli_query($mysqli,"SELECT * FROM assets 
+$sql = mysqli_query($mysqli,"SELECT * FROM assets
     LEFT JOIN clients ON asset_client_id = client_id
     LEFT JOIN contacts ON asset_contact_id = contact_id
     LEFT JOIN locations ON asset_location_id = location_id
     LEFT JOIN vendors ON asset_vendor_id = vendor_id
     $where
     ORDER BY asset_name ASC"
-);
+) or die("SQL Error: " . mysqli_error($mysqli));
+
+$sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients WHERE client_archived_at IS NULL ORDER BY client_name ASC")
+    or die("SQL Error: " . mysqli_error($mysqli));
 
 ?>
 
