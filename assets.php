@@ -175,6 +175,9 @@ if (mysqli_num_rows($os_sql) > 0) {
                     <a class="dropdown-item text-dark" href="#" data-toggle="modal" data-target="#importAssetModal">
                         <i class="fa fa-fw fa-upload mr-2"></i>Import
                     </a>
+                    <a class="dropdown-item text-dark" href="export_sample_asset_csv.php">
+                        <i class="fa fa-fw fa-file-excel mr-2"></i>Export Sample Excel
+                    </a>
                     <?php } ?>
                     <?php if ($num_rows[0] > 0) { ?>
                         <div class="dropdown-divider"></div>
