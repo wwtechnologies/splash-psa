@@ -69,6 +69,20 @@ CREATE TABLE IF NOT EXISTS `ticket_assignees` (
 
 executeSql($mysqli, $ticket_assignees_sql, "Creating ticket_assignees table");
 
+// Create task_assignees table
+$task_assignees_sql = "
+CREATE TABLE IF NOT EXISTS `task_assignees` (
+  `todo_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`todo_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `task_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `task_assignees_ibfk_2` FOREIGN KEY (`todo_id`) REFERENCES `todos` (`todo_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+";
+
+executeSql($mysqli, $task_assignees_sql, "Creating task_assignees table");
+
 // Migrate existing data
 echo "<h2>Migrating existing data</h2>";
 
@@ -101,13 +115,17 @@ echo "<h2>Summary</h2>
     <li>post/user/ticket.php</li>
     <li>post/user/ticket_recurring_model.php</li>
     <li>ticket.php</li>
+    <li>tasks.php</li>
+    <li>post/user/task.php</li>
+    <li>ajax/ajax_task_assign.php</li>
 </ul>
 <p>The following tables have been added:</p>
 <ul>
     <li>recurring_ticket_assignees</li>
     <li>ticket_assignees</li>
+    <li>task_assignees</li>
 </ul>
-<p>You can now assign multiple people to both recurring tickets and regular tickets.</p>
+<p>You can now assign multiple people to recurring tickets, regular tickets, and tasks.</p>
 </div>
 </body>
 </html>";

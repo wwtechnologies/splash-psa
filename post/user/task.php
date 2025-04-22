@@ -6,6 +6,35 @@
 
 defined('FROM_POST_HANDLER') || die("Direct file access is not allowed");
 
+// Handle task assignments
+if (isset($_POST['assign_task'])) {
+    enforceUserPermission('module_support', 2);
+
+    $task_id = intval($_POST['task_id']);
+    $assignees = isset($_POST['assignees']) ? $_POST['assignees'] : array();
+
+    // Clear existing assignees
+    mysqli_query($mysqli, "DELETE FROM task_assignees WHERE todo_id = $task_id");
+
+    // Add new assignees
+    foreach ($assignees as $assignee_id) {
+        $assignee_id = intval($assignee_id);
+        mysqli_query($mysqli, "INSERT INTO task_assignees (todo_id, user_id) VALUES ($task_id, $assignee_id)");
+    }
+
+    // Get task name for logging
+    $sql = mysqli_query($mysqli, "SELECT task_name FROM tasks WHERE task_id = $task_id");
+    $row = mysqli_fetch_array($sql);
+    $task_name = sanitizeInput($row['task_name']);
+
+    // Logging
+    logAction("Task", "Edit", "$session_name updated assignees for task $task_name", 0, $task_id);
+
+    $_SESSION['alert_message'] = "Task assignees updated successfully";
+
+    header("Location: " . $_SERVER["HTTP_REFERER"]);
+}
+
 if (isset($_POST['add_task'])) {
 
     enforceUserPermission('module_support', 2);
@@ -22,6 +51,14 @@ if (isset($_POST['add_task'])) {
     mysqli_query($mysqli, "INSERT INTO tasks SET task_name = '$task_name', task_completion_estimate = $task_completion_estimate, task_ticket_id = $ticket_id");
 
     $task_id = mysqli_insert_id($mysqli);
+
+    // Handle assignees if provided
+    if (isset($_POST['assignees'])) {
+        foreach ($_POST['assignees'] as $assignee_id) {
+            $assignee_id = intval($assignee_id);
+            mysqli_query($mysqli, "INSERT INTO task_assignees (todo_id, user_id) VALUES ($task_id, $assignee_id)");
+        }
+    }
 
     // Logging
     logAction("Task", "Create", "$session_name created task $task_name", $client_id, $task_id);
@@ -45,6 +82,18 @@ if (isset($_POST['edit_ticket_task'])) {
     $row = mysqli_fetch_array($sql);
     $client_id = intval($row['ticket_client_id']);
     mysqli_query($mysqli, "UPDATE tasks SET task_name = '$task_name', task_order = $task_order, task_completion_estimate = $task_completion_estimate WHERE task_id = $task_id");
+
+    // Handle assignees if provided
+    if (isset($_POST['assignees'])) {
+        // Clear existing assignees
+        mysqli_query($mysqli, "DELETE FROM task_assignees WHERE todo_id = $task_id");
+        
+        // Add new assignees
+        foreach ($_POST['assignees'] as $assignee_id) {
+            $assignee_id = intval($assignee_id);
+            mysqli_query($mysqli, "INSERT INTO task_assignees (todo_id, user_id) VALUES ($task_id, $assignee_id)");
+        }
+    }
 
     // Logging
     logAction("Task", "Edit", "$session_name edited task $task_name", $client_id, $task_id);

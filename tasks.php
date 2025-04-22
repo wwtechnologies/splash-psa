@@ -6,11 +6,16 @@ require_once "includes/inc_all.php";
 enforceUserPermission('module_support');
 
 // Get tasks with their associated tickets
-$sql = mysqli_query($mysqli, "SELECT tasks.*, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, tickets.ticket_client_id, clients.client_name 
-                             FROM tasks 
-                             LEFT JOIN tickets ON tasks.task_ticket_id = tickets.ticket_id
-                             LEFT JOIN clients ON tickets.ticket_client_id = clients.client_id
-                             ORDER BY tasks.task_completed_at ASC, tasks.task_order ASC, tasks.task_id ASC");
+$sql = mysqli_query($mysqli, "SELECT tasks.*, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject,
+    tickets.ticket_client_id, clients.client_name,
+    GROUP_CONCAT(DISTINCT users.user_name ORDER BY users.user_name ASC SEPARATOR ', ') as assignee_names
+    FROM tasks
+    LEFT JOIN tickets ON tasks.task_ticket_id = tickets.ticket_id
+    LEFT JOIN clients ON tickets.ticket_client_id = clients.client_id
+    LEFT JOIN task_assignees ON tasks.task_id = task_assignees.todo_id
+    LEFT JOIN users ON task_assignees.user_id = users.user_id
+    GROUP BY tasks.task_id
+    ORDER BY tasks.task_completed_at ASC, tasks.task_order ASC, tasks.task_id ASC");
 
 // Get clients for filter dropdown
 $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients ORDER BY client_name ASC");
@@ -81,6 +86,7 @@ $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients
                         <th>Task</th>
                         <th>Ticket</th>
                         <th>Client</th>
+                        <th>Assignees</th>
                         <th>Est. Time</th>
                         <th>Actions</th>
                     </tr>
@@ -98,6 +104,7 @@ $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients
                         $ticket_subject = nullable_htmlentities($row['ticket_subject']);
                         $client_id = intval($row['ticket_client_id']);
                         $client_name = nullable_htmlentities($row['client_name']);
+                        $assignee_names = nullable_htmlentities($row['assignee_names']);
                         
                         $ticket_link = "ticket.php?ticket_id=$task_ticket_id";
                         $ticket_display = "$ticket_prefix$ticket_number - $ticket_subject";
@@ -116,6 +123,7 @@ $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients
                             } else {
                                 $task_actions .= "<a href='post.php?complete_task=$task_id' class='btn btn-sm btn-success mr-1' title='Mark Complete'><i class='fas fa-check'></i></a>";
                             }
+                            $task_actions .= "<a href='#' data-toggle='ajax-modal' data-ajax-url='ajax/ajax_task_assign.php' data-ajax-id='$task_id' class='btn btn-sm btn-info mr-1' title='Assign Task'><i class='fas fa-user-check'></i></a>";
                             $task_actions .= "<a href='#' data-toggle='ajax-modal' data-ajax-url='ajax/ajax_ticket_task_edit.php' data-ajax-id='$task_id' class='btn btn-sm btn-primary mr-1' title='Edit Task'><i class='fas fa-edit'></i></a>";
                             $task_actions .= "<a href='post.php?delete_task=$task_id&csrf_token=" . $_SESSION['csrf_token'] . "' class='btn btn-sm btn-danger confirm-link' title='Delete Task'><i class='fas fa-trash'></i></a>";
                         }
@@ -125,6 +133,7 @@ $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients
                         echo "<td>$task_name</td>";
                         echo "<td><a href='$ticket_link'>$ticket_display</a></td>";
                         echo "<td>$client_name</td>";
+                        echo "<td>$assignee_names</td>";
                         echo "<td>$task_completion_estimate min</td>";
                         echo "<td>$task_actions</td>";
                         echo "</tr>";
@@ -170,6 +179,23 @@ $sql_clients = mysqli_query($mysqli, "SELECT client_id, client_name FROM clients
                     <div class="form-group">
                         <label for="estimate">Estimated Completion Time (minutes)</label>
                         <input type="number" class="form-control" name="estimate" id="estimate" value="15" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Assign To</label>
+                        <select class="form-control select2" name="assignees[]" multiple data-placeholder="- Select Assignees -">
+                            <?php
+                            $sql_users = mysqli_query($mysqli, "SELECT users.user_id, user_name FROM users
+                                LEFT JOIN user_settings on users.user_id = user_settings.user_id
+                                WHERE user_type = 1
+                                AND user_archived_at IS NULL
+                                ORDER BY user_name ASC");
+                            while ($user_row = mysqli_fetch_array($sql_users)) {
+                                $user_id = intval($user_row['user_id']);
+                                $user_name = nullable_htmlentities($user_row['user_name']);
+                                echo "<option value='$user_id'>$user_name</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                     <button type="submit" name="add_task" class="btn btn-primary">Add Task</button>
                 </form>
