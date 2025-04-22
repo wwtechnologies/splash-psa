@@ -17,7 +17,7 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
 
     // We need updates!
 
-    if (CURRENT_DATABASE_VERSION == '2.1.4') {
+    if (CURRENT_DATABASE_VERSION == '2.1.5') {
         // Create todos table
         mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todos` (
             `todo_id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -42,12 +42,10 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
             CONSTRAINT `todo_assignments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-        // Add app version column if it doesn't exist
-        mysqli_query($mysqli, "ALTER TABLE `settings`
-            ADD COLUMN IF NOT EXISTS `config_current_app_version` VARCHAR(20) NOT NULL DEFAULT '2.1.5'");
-
-        // Update database version
-        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.5'");
+        // Update both database and app version
+        mysqli_query($mysqli, "UPDATE `settings` SET
+            `config_current_database_version` = '2.1.6',
+            `config_current_app_version` = '2.1.6'");
     }
 
     if (CURRENT_DATABASE_VERSION == '0.2.0') {
