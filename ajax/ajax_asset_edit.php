@@ -157,6 +157,16 @@ ob_start();
                             <input type="text" class="form-control" name="serial" placeholder="Serial number" maxlength="200" value="<?php echo $asset_serial; ?>">
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label>Inventory Barcode</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-fw fa-barcode"></i></span>
+                            </div>
+                            <input type="text" class="form-control" name="inventory_barcode" placeholder="Inventory barcode" maxlength="200" value="<?php echo $asset_inventory_barcode; ?>">
+                        </div>
+                    </div>
                 <?php } ?>
 
                 <?php if ($asset_type !== 'Phone' && $asset_type !== 'Mobile Phone' && $asset_type !== 'Tablet' && $asset_type !== 'Access Point' && $asset_type !== 'Printer' && $asset_type !== 'Camera' && $asset_type !== 'TV' && $asset_type !== 'Other') { ?>

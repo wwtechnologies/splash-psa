@@ -22,3 +22,14 @@ $assigned_to = "0";
 if (isset($_POST['assigned_to'])) {
     $assigned_to = intval($_POST['assigned_to']);
 }
+
+// Process additional assignees
+$additional_assignees = array();
+if (isset($_POST['additional_assignees']) && is_array($_POST['additional_assignees'])) {
+    foreach ($_POST['additional_assignees'] as $assignee) {
+        $assignee_id = intval($assignee);
+        if ($assignee_id > 0 && $assignee_id != $assigned_to) {
+            $additional_assignees[] = $assignee_id;
+        }
+    }
+}

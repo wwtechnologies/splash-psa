@@ -17,6 +17,51 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
 
     // We need updates!
 
+    if (CURRENT_DATABASE_VERSION == '2.1.7') {
+        // Create task_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `task_assignees` (
+            `todo_id` int(11) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            PRIMARY KEY (`todo_id`,`user_id`),
+            KEY `user_id` (`user_id`),
+            CONSTRAINT `task_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+            CONSTRAINT `task_assignees_ibfk_2` FOREIGN KEY (`todo_id`) REFERENCES `todos` (`todo_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+
+        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.8'");
+    }
+
+    if (CURRENT_DATABASE_VERSION == '2.1.5') {
+        // Create todos table
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todos` (
+            `todo_id` INT(11) NOT NULL AUTO_INCREMENT,
+            `todo_name` VARCHAR(255) NOT NULL,
+            `todo_description` TEXT,
+            `todo_created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `todo_created_by` INT(11) NOT NULL,
+            `todo_completed_at` DATETIME DEFAULT NULL,
+            `todo_completed_by` INT(11) DEFAULT NULL,
+            `todo_due_date` DATE DEFAULT NULL,
+            `todo_priority` VARCHAR(20) DEFAULT 'Medium',
+            PRIMARY KEY (`todo_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Create todo assignments table
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todo_assignments` (
+            `todo_id` int(11) NOT NULL,
+            `user_id` int(11) NOT NULL,
+            PRIMARY KEY (`todo_id`,`user_id`),
+            KEY `user_id` (`user_id`),
+            CONSTRAINT `todo_assignments_ibfk_1` FOREIGN KEY (`todo_id`) REFERENCES `todos` (`todo_id`) ON DELETE CASCADE,
+            CONSTRAINT `todo_assignments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Update both database and app version
+        mysqli_query($mysqli, "UPDATE `settings` SET
+            `config_current_database_version` = '2.1.6',
+            `config_current_app_version` = '2.1.6'");
+    }
+
     if (CURRENT_DATABASE_VERSION == '0.2.0') {
         //Insert queries here required to update to DB version 0.2.1
 
@@ -3457,13 +3502,53 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
         mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.3'");
     }
 
-    // if (CURRENT_DATABASE_VERSION == '2.1.3') {
-    //     // Insert queries here required to update to DB version 2.1.4
-    //     // Then, update the database to the next sequential version
-    //     mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.4'");
-    // }
+    if (CURRENT_DATABASE_VERSION == '2.1.3') {
+        // Create recurring_ticket_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `recurring_ticket_assignees` (
+          `recurring_ticket_id` int(11) NOT NULL,
+          `user_id` int(11) NOT NULL,
+          PRIMARY KEY (`recurring_ticket_id`,`user_id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `recurring_ticket_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+          CONSTRAINT `recurring_ticket_assignees_ibfk_2` FOREIGN KEY (`recurring_ticket_id`) REFERENCES `recurring_tickets` (`recurring_ticket_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        // Create ticket_assignees table for multiple assignees
+        mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `ticket_assignees` (
+          `ticket_id` int(11) NOT NULL,
+          `user_id` int(11) NOT NULL,
+          PRIMARY KEY (`ticket_id`,`user_id`),
+          KEY `user_id` (`user_id`),
+          CONSTRAINT `ticket_assignees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+          CONSTRAINT `ticket_assignees_ibfk_2` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+        // Migrate existing data - copy primary assignees to the new tables
+        mysqli_query($mysqli, "INSERT IGNORE INTO recurring_ticket_assignees (recurring_ticket_id, user_id)
+        SELECT recurring_ticket_id, recurring_ticket_assigned_to
+        FROM recurring_tickets
+        WHERE recurring_ticket_assigned_to > 0");
+
+        mysqli_query($mysqli, "INSERT IGNORE INTO ticket_assignees (ticket_id, user_id)
+        SELECT ticket_id, ticket_assigned_to
+        FROM tickets
+        WHERE ticket_assigned_to > 0");
+
+        // Then, update the database to the next sequential version
+        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.4'");
+    }
 
 } else {
     // Up-to-date
 }
 
+
+if (CURRENT_DATABASE_VERSION == '2.1.6') {
+        // Add inventory_barcode field to assets table
+        mysqli_query($mysqli, "ALTER TABLE `assets` ADD `asset_inventory_barcode` varchar(200) DEFAULT NULL AFTER `asset_serial`");
+
+        // Update database version
+        mysqli_query($mysqli, "UPDATE `settings` SET
+            `config_current_database_version` = '2.1.7',
+            `config_current_app_version` = '2.1.7'");
+    }

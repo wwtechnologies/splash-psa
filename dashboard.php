@@ -646,6 +646,118 @@ if ($user_config_dashboard_technical_enable == 1) {
         <!-- ./col -->
     </div> <!-- row -->
 
+    <?php
+    // Get user's to-do items
+    $sql_your_todos = mysqli_query($mysqli, "SELECT DISTINCT todos.*,
+                                           CONCAT(users.user_name) AS created_by_name,
+                                           GROUP_CONCAT(DISTINCT assigned_users.user_name SEPARATOR ', ') as assigned_users
+                                           FROM todos
+                                           LEFT JOIN users ON todos.todo_created_by = users.user_id
+                                           LEFT JOIN todo_assignments ta ON todos.todo_id = ta.todo_id
+                                           LEFT JOIN users AS assigned_users ON ta.user_id = assigned_users.user_id
+                                           WHERE (todos.todo_created_by = $session_user_id
+                                              OR ta.user_id = $session_user_id)
+                                           AND todo_completed_at IS NULL
+                                           GROUP BY todos.todo_id
+                                           ORDER BY
+                                             CASE
+                                               WHEN todo_priority = 'High' THEN 1
+                                               WHEN todo_priority = 'Medium' THEN 2
+                                               WHEN todo_priority = 'Low' THEN 3
+                                               ELSE 4
+                                             END ASC,
+                                             CASE
+                                               WHEN todo_due_date IS NULL THEN 1
+                                               ELSE 0
+                                             END ASC,
+                                             todo_due_date ASC,
+                                             todo_created_at DESC
+                                           LIMIT 10");
+    
+    $your_todos = mysqli_num_rows($sql_your_todos);
+    ?>
+
+    <?php if ($your_todos) { ?>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-dark mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa fa-fw fa-check-square mr-2"></i>Your To-Do Items</h3>
+                        <div class="card-tools">
+                            <a href="todos.php" class="btn btn-tool">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive-sm">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Due Date</th>
+                                    <th>Created By</th>
+                                    <th>Assigned To</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_array($sql_your_todos)) {
+                                    $todo_id = intval($row['todo_id']);
+                                    $todo_name = nullable_htmlentities($row['todo_name']);
+                                    $todo_description = nullable_htmlentities($row['todo_description']);
+                                    $todo_priority = nullable_htmlentities($row['todo_priority']);
+                                    $todo_due_date = nullable_htmlentities($row['todo_due_date']);
+                                    $todo_created_at = nullable_htmlentities($row['todo_created_at']);
+                                    $todo_created_at_time_ago = timeAgo($row['todo_created_at']);
+                                    
+                                    // Format due date
+                                    $due_date_formatted = $todo_due_date ? date('M j, Y', strtotime($todo_due_date)) : '-';
+                                    
+                                    // Determine if due date is past
+                                    $due_date_class = '';
+                                    if ($todo_due_date) {
+                                        $today = new DateTime();
+                                        $due = new DateTime($todo_due_date);
+                                        if ($due < $today) {
+                                            $due_date_class = 'text-danger font-weight-bold';
+                                        }
+                                    }
+                                    
+                                    // Determine priority badge
+                                    $priority_badge = '';
+                                    if ($todo_priority == 'High') {
+                                        $priority_badge = '<span class="badge badge-danger">High</span>';
+                                    } elseif ($todo_priority == 'Medium') {
+                                        $priority_badge = '<span class="badge badge-warning">Medium</span>';
+                                    } elseif ($todo_priority == 'Low') {
+                                        $priority_badge = '<span class="badge badge-info">Low</span>';
+                                    }
+                                ?>
+                                    <tr>
+                                        <td><a class="text-dark" href="#" data-toggle="ajax-modal" data-ajax-url="ajax/ajax_todo_edit.php" data-ajax-id="<?php echo $todo_id; ?>"><?php echo $todo_name; ?></a></td>
+                                        <td><?php echo $todo_description ? substr($todo_description, 0, 50) . (strlen($todo_description) > 50 ? '...' : '') : '-'; ?></td>
+                                        <td><?php echo $priority_badge; ?></td>
+                                        <td class="<?php echo $due_date_class; ?>"><?php echo $due_date_formatted; ?></td>
+                                        <td><?php echo $row['created_by_name']; ?></td>
+                                        <td><?php echo $row['assigned_users'] ? $row['assigned_users'] : '-'; ?></td>
+                                        <td>
+                                            <a href="post.php?complete_todo=<?php echo $todo_id; ?>" class="btn btn-sm btn-success" title="Mark Complete"><i class="fas fa-check"></i></a>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
+
     <?php if ($your_tickets) { ?>
         <div class="row">
             <div class="col-12">

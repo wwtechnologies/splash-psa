@@ -1,11 +1,8 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-<?php echo nullable_htmlentities($config_theme); ?> d-print-none">
 
-    <a class="brand-link" href="dashboard.php">
-        <div class="brand-image">
-            <i class="fas fa-building fa-2x"></i>
-        </div>
-        <span class="brand-text h5 ml-2"><?php echo nullable_htmlentities($session_company_name); ?></span>
+    <a class="brand-link text-center" href="dashboard.php">
+        <img src="assets/logo/cktc logo.png" alt="<?php echo nullable_htmlentities($session_company_name); ?> Logo" style="max-height: 40px; margin: 0 auto;">
     </a>
 
     <!-- Sidebar -->
@@ -46,6 +43,12 @@
                                         <span class="right badge text-light" data-toggle="tooltip" title="Open Tickets"><?php echo $num_active_tickets; ?></span>
                                     <?php } ?>
                                 </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="todos.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "todos.php") { echo "active"; } ?>">
+                                <i class="nav-icon fas fa-check-square"></i>
+                                <p>To-Do List</p>
                             </a>
                         </li>
                         <li class="nav-item">

@@ -1,7 +1,7 @@
 <?php
 
 // Enforce a Content Security Policy for security against cross-site scripting
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'");
 
 if (!file_exists('config.php')) {
     header("Location: setup.php");
@@ -295,100 +295,97 @@ if (isset($_POST['login'])) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><?php echo nullable_htmlentities($company_name); ?> | Login</title>
-    <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
 
-    <!--
-    Favicon
-    If Fav Icon exists else use the default one
-    -->
+    <!-- Favicon -->
     <?php if(file_exists('uploads/favicon.ico')) { ?>
         <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
     <?php } ?>
 
     <!-- Theme style -->
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
-
+    
+    <!-- Custom Login CSS -->
+    <link rel="stylesheet" href="css/login.css">
 </head>
-<body class="hold-transition login-page">
-
-<div class="login-box">
-    <div class="login-logo">
-        <?php if (!empty($company_logo)) { ?>
-            <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
-        <?php } else { ?>
-            <span class="text-primary text-bold"><i class="fas fa-paper-plane mr-2"></i>IT</span>Flow
-        <?php } ?>
-    </div>
-
-    <!-- /.login-logo -->
-    <div class="card">
-        <div class="card-body login-card-body">
-
-            <?php if (!empty($config_login_message)){ ?>
-            <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
-            <?php } ?>
-
-            <?php if (isset($response)) { ?>
-            <p><?php echo $response; ?></p>
-            <?php } ?>
-
-            <form method="post">
-
-                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                    <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?> >
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-envelope"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group mb-3" <?php if (isset($token_field)) { echo "hidden"; } ?>>
-                    <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <?php
-                if (isset($token_field)) {
-
-                    echo $token_field;
-                ?>
-
-                <div class="form-group mb-3">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                        <label class="custom-control-label" for="remember_me">Remember Me</label>
-                    </div>
-                </div>
-
-                <?php
-
-                }
-
-                ?>
-
-                <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
-
-                <?php if($config_client_portal_enable == 1){ ?>
-                    <hr>
-                    <h5 class="text-center">Looking for the <a href="client">Client Portal?<a/></h5>
+<body>
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-form">
+                <h1>Welcome</h1>
+                <p class="subtitle">Secure access to your IT documentation and asset management portal. Login to manage your infrastructure.</p>
+                
+                <?php if (!empty($config_login_message)){ ?>
+                <p class="mb-4"><?php echo nl2br($config_login_message); ?></p>
                 <?php } ?>
 
-            </form>
-
+                <?php if (isset($response)) { ?>
+                <div class="mb-4"><?php echo $response; ?></div>
+                <?php } ?>
+                
+                <form method="post">
+                    <div class="form-group" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                        <input type="text" class="form-control" placeholder="Agent Email" name="email" value="<?php if (isset($token_field)) { echo $email; }?>" required <?php if (!isset($token_field)) { echo "autofocus"; } ?>>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" <?php if (isset($token_field)) { echo "hidden"; } ?>>
+                        <input type="password" class="form-control" placeholder="Agent Password" name="password" value="<?php if (isset($token_field)) { echo $password; } ?>" required>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                    
+                    <?php
+                    if (isset($token_field)) {
+                        echo $token_field;
+                    ?>
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    <?php
+                    } else {
+                    ?>
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    
+                    <button type="submit" class="btn-login" name="login">Login</button>
+                    
+                    <div class="login-links">
+                        <a href="#">Request Access</a>
+                        <a href="#">Forgot Password</a>
+                    </div>
+                </form>
+                
+                <?php if($config_client_portal_enable == 1){ ?>
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="client" style="color: #1976d2; text-decoration: none;">Looking for the Client Portal?</a>
+                </div>
+                <?php } ?>
+            </div>
+            
+            <div class="login-image">
+                <div class="brand-logo">
+                    <img src="assets/logo/cktc logo.png" alt="<?php echo nullable_htmlentities($company_name); ?> Logo" class="logo-img">
+                </div>
+                <div class="brand-tagline">
+                    Comprehensive IT Documentation & Asset Management Portal
+                </div>
+            </div>
         </div>
-        <!-- /.login-card-body -->
     </div>
-</div>
-<!-- /.login-box -->
 
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>

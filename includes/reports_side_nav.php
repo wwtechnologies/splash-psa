@@ -104,6 +104,14 @@
                         </a>
                     </li>
                 <?php } ?>
+                <?php if (lookupUserPermission("module_support") >= 1) { ?>
+                    <li class="nav-item">
+                        <a href="report_asset_inventory.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "report_asset_inventory.php") { echo "active"; } ?>">
+                            <i class="nav-icon fas fa-barcode"></i>
+                            <p>Asset Inventory</p>
+                        </a>
+                    </li>
+                <?php } ?>
                 <?php if (lookupUserPermission("module_credential") >= 1) { ?>
                     <li class="nav-item">
                         <a href="report_credential_rotation.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "report_credential_rotation.php") { echo "active"; } ?>">

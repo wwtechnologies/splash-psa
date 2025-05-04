@@ -18,6 +18,13 @@ $ticket_status = intval($row['ticket_status']);
 $ticket_closed_at = nullable_htmlentities($row['ticket_closed_at']);
 $client_name = nullable_htmlentities($row['client_name']);
 
+// Get additional assignees
+$additional_assignees = array();
+$sql_additional_assignees = mysqli_query($mysqli, "SELECT user_id FROM ticket_assignees WHERE ticket_id = $ticket_id");
+while ($assignee_row = mysqli_fetch_array($sql_additional_assignees)) {
+    $additional_assignees[] = intval($assignee_row['user_id']);
+}
+
 // Generate the HTML form content using output buffering.
 ob_start();
 
@@ -36,7 +43,7 @@ ob_start();
     <div class="modal-body bg-white">
 
         <div class="form-group">
-            <label>Assign to</label>
+            <label>Primary Assignee</label>
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-fw fa-user-check"></i></span>
@@ -56,6 +63,30 @@ ob_start();
 
                         ?>
                         <option value="<?php echo $user_id_select; ?>" <?php if ($user_id_select  == $ticket_assigned_to) { echo "selected"; } ?>><?php echo $user_name_select; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Additional Assignees</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-fw fa-users"></i></span>
+                </div>
+                <select class="form-control select2" name="additional_assignees[]" multiple data-placeholder="- Select Additional Assignees -">
+                    <?php
+                    $sql_users_select = mysqli_query($mysqli, "SELECT users.user_id, user_name FROM users
+                        LEFT JOIN user_settings on users.user_id = user_settings.user_id
+                        WHERE user_type = 1
+                        AND user_archived_at IS NULL
+                        ORDER BY user_name DESC"
+                    );
+                    while ($row = mysqli_fetch_array($sql_users_select)) {
+                        $user_id_select = intval($row['user_id']);
+                        $user_name_select = nullable_htmlentities($row['user_name']);
+                        ?>
+                        <option value="<?php echo $user_id_select; ?>" <?php if (in_array($user_id_select, $additional_assignees) && $ticket_assigned_to != $user_id_select) { echo "selected"; } ?>><?php echo $user_name_select; ?></option>
                     <?php } ?>
                 </select>
             </div>
