@@ -33,6 +33,7 @@ if (isset($_GET['asset_id'])) {
     $asset_make = nullable_htmlentities($row['asset_make']);
     $asset_model = nullable_htmlentities($row['asset_model']);
     $asset_serial = nullable_htmlentities($row['asset_serial']);
+    $asset_inventory_barcode = nullable_htmlentities($row['asset_inventory_barcode']);
     $asset_os = nullable_htmlentities($row['asset_os']);
     $asset_uri = nullable_htmlentities($row['asset_uri']);
     $asset_uri_2 = nullable_htmlentities($row['asset_uri_2']);
@@ -264,6 +265,31 @@ if (isset($_GET['asset_id'])) {
                     <?php }
                     if ($asset_serial) { ?>
                         <div class="mt-2"><i class="fa fa-fw fa-barcode text-secondary mr-3"></i><?php echo $asset_serial; ?></div>
+                    <?php }
+                    // Display asset_inventory_barcode and barcode image
+                    if ($asset_inventory_barcode) { ?>
+                        <div class="mt-2" id="barcode-section">
+                            <div>
+                                <strong>Inventory Barcode:</strong>
+                                <span id="barcode-value"><?php echo $asset_inventory_barcode; ?></span>
+                            </div>
+                            <div class="my-2">
+                                <img id="barcode-image" src="plugins/barcode/barcode.php?text=<?php echo urlencode($asset_inventory_barcode); ?>&size=40&print=true" alt="Barcode for <?php echo $asset_inventory_barcode; ?>">
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="printBarcodeSection()">
+                                <i class="fa fa-print"></i> Print Barcode
+                            </button>
+                        </div>
+                        <script>
+                        function printBarcodeSection() {
+                            var printContents = document.getElementById('barcode-section').innerHTML;
+                            var originalContents = document.body.innerHTML;
+                            document.body.innerHTML = printContents;
+                            window.print();
+                            document.body.innerHTML = originalContents;
+                            location.reload();
+                        }
+                        </script>
                     <?php }
                     if ($asset_purchase_date) { ?>
                         <div class="mt-2"><i class="fa fa-fw fa-shopping-cart text-secondary mr-3"></i><?php echo date('Y-m-d', strtotime($asset_purchase_date)); ?></div>
