@@ -267,14 +267,23 @@ if (isset($_GET['asset_id'])) {
                         <div class="mt-2"><i class="fa fa-fw fa-barcode text-secondary mr-3"></i><?php echo $asset_serial; ?></div>
                     <?php }
                     // Display asset_inventory_barcode and barcode image
-                    if ($asset_inventory_barcode) { ?>
+                    if (!empty($asset_inventory_barcode)) { ?>
                         <div class="mt-2" id="barcode-section">
                             <div>
                                 <strong>Inventory Barcode:</strong>
                                 <span id="barcode-value"><?php echo $asset_inventory_barcode; ?></span>
                             </div>
                             <div class="my-2">
-                                <img id="barcode-image" src="plugins/barcode/barcode.php?text=<?php echo urlencode($asset_inventory_barcode); ?>&size=40&print=true" alt="Barcode for <?php echo $asset_inventory_barcode; ?>">
+                                <img
+                                    id="barcode-image"
+                                    src="plugins/barcode/barcode.php?text=<?php echo urlencode($asset_inventory_barcode); ?>&size=40&print=true"
+                                    alt="Barcode for <?php echo $asset_inventory_barcode; ?>"
+                                    onerror="this.style.display='none';document.getElementById('barcode-error').style.display='block';"
+                                >
+                                <div id="barcode-error" style="display:none;color:#b94a48;">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    Unable to generate barcode image.
+                                </div>
                             </div>
                             <button class="btn btn-sm btn-outline-secondary" onclick="printBarcodeSection()">
                                 <i class="fa fa-print"></i> Print Barcode
@@ -310,6 +319,17 @@ if (isset($_GET['asset_id'])) {
                             }, 500);
                         }
                         </script>
+                    <?php } else { ?>
+                        <div class="mt-2" id="barcode-section">
+                            <div>
+                                <strong>Inventory Barcode:</strong>
+                                <span id="barcode-value" style="color:#b94a48;">Not available</span>
+                            </div>
+                            <div class="my-2" style="color:#b94a48;">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                Barcode not set or unavailable.
+                            </div>
+                        </div>
                     <?php }
                     if ($asset_purchase_date) { ?>
                         <div class="mt-2"><i class="fa fa-fw fa-shopping-cart text-secondary mr-3"></i><?php echo date('Y-m-d', strtotime($asset_purchase_date)); ?></div>
