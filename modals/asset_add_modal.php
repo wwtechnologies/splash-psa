@@ -453,3 +453,36 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    $('#addAssetModal').on('show.bs.modal', function () {
+        var $modal = $(this);
+        function generateBarcode() {
+            return 'INV-' + Date.now() + '-' + Math.floor(1000 + Math.random() * 9000);
+        }
+        function checkAndSetBarcode() {
+            var candidate = generateBarcode();
+            $.ajax({
+                url: 'ajax/ajax_barcode_check.php',
+                type: 'POST',
+                data: { barcode: candidate },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.unique) {
+                        $modal.find('input[name="inventory_barcode"]').val(candidate);
+                    } else {
+                        // Try again if not unique
+                        setTimeout(checkAndSetBarcode, 50);
+                    }
+                },
+                error: function() {
+                    // On error, still try again (network hiccup)
+                    setTimeout(checkAndSetBarcode, 100);
+                }
+            });
+        }
+        checkAndSetBarcode();
+    });
+});
+</script>
