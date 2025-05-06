@@ -282,12 +282,32 @@ if (isset($_GET['asset_id'])) {
                         </div>
                         <script>
                         function printBarcodeSection() {
-                            var printContents = document.getElementById('barcode-section').innerHTML;
-                            var originalContents = document.body.innerHTML;
-                            document.body.innerHTML = printContents;
-                            window.print();
-                            document.body.innerHTML = originalContents;
-                            location.reload();
+                            var section = document.getElementById('barcode-section');
+                            var printWindow = window.open('', '', 'height=600,width=400');
+                            var styleSheets = '';
+                            // Collect all stylesheets
+                            Array.from(document.styleSheets).forEach(function(sheet) {
+                                if (sheet.href) {
+                                    styleSheets += '<link rel="stylesheet" href="' + sheet.href + '">';
+                                } else if (sheet.ownerNode && sheet.ownerNode.tagName === 'STYLE') {
+                                    styleSheets += '<style>' + sheet.ownerNode.innerHTML + '</style>';
+                                }
+                            });
+                            printWindow.document.write('<html><head><title>Print Barcode</title>' + styleSheets + '</head><body>');
+                            // Clone the card header for context if needed
+                            var card = section.closest('.card');
+                            if (card) {
+                                printWindow.document.write(card.outerHTML);
+                            } else {
+                                printWindow.document.write(section.outerHTML);
+                            }
+                            printWindow.document.write('</body></html>');
+                            printWindow.document.close();
+                            printWindow.focus();
+                            setTimeout(function() {
+                                printWindow.print();
+                                printWindow.close();
+                            }, 500);
                         }
                         </script>
                     <?php }
