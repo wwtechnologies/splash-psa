@@ -149,7 +149,11 @@ $sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients 
                             <?php echo $asset_inventory_barcode; ?>
                             <?php if (!empty($asset_inventory_barcode)): ?>
                                 <br>
-                                <img src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_inventory_barcode); ?>" alt="Barcode" height="40">
+                                <img id="barcode-img-<?php echo $asset_id; ?>" src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_inventory_barcode); ?>" alt="Barcode" height="40">
+                                <br>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="printBarcode('<?php echo htmlspecialchars($asset_inventory_barcode, ENT_QUOTES); ?>')">
+                                    <i class="fas fa-print"></i> Print Inventory Barcode
+                                </button>
                             <?php endif; ?>
                         </td>
                         <td><?php echo $contact_name; ?></td>
@@ -191,6 +195,36 @@ $(document).ready(function() {
         ]
     });
 });
+</script>
+
+<script>
+function printBarcode(barcodeValue) {
+    // Open a new window for printing
+    var printWindow = window.open('', '', 'width=400,height=300');
+    var barcodeUrl = 'plugins/barcode/barcode.php?s=code128&d=' + encodeURIComponent(barcodeValue);
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Print Barcode</title>
+            <style>
+                body { text-align: center; margin: 0; padding: 40px 0; font-family: Arial, sans-serif; }
+                .barcode-value { margin-top: 16px; font-size: 18px; letter-spacing: 2px; }
+                @media print {
+                    button { display: none; }
+                    body { margin: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <img src="` + barcodeUrl + `" alt="Barcode" style="height:80px; display:block; margin:0 auto;">
+            <div class="barcode-value">` + barcodeValue + `</div>
+            <button onclick="window.print()">Print</button>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+}
 </script>
 
 <?php require_once "includes/footer.php"; ?>
