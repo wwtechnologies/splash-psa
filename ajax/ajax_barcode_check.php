@@ -11,7 +11,7 @@ if (empty($barcode)) {
     exit;
 }
 
-$stmt = $mysqli->prepare("SELECT asset_id FROM assets WHERE asset_inventory_barcode = ? LIMIT 1");
+$stmt = $mysqli->prepare("SELECT asset_id FROM assets WHERE asset_asset_inventory_barcode = ? LIMIT 1");
 $stmt->bind_param('s', $barcode);
 $stmt->execute();
 $stmt->store_result();

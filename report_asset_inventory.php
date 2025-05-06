@@ -35,7 +35,7 @@ if (!empty($where_array)) {
     $where = 'WHERE ' . implode(' AND ', $where_array);
 }
 
-$sql = mysqli_query($mysqli,"SELECT assets.*, assets.inventory_barcode, clients.client_name, contacts.contact_name, locations.location_name, vendors.vendor_name
+$sql = mysqli_query($mysqli,"SELECT assets.*, assets.asset_inventory_barcode, clients.client_name, contacts.contact_name, locations.location_name, vendors.vendor_name
     FROM assets
     LEFT JOIN clients ON asset_client_id = client_id
     LEFT JOIN contacts ON asset_contact_id = contact_id
@@ -131,7 +131,7 @@ $sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients 
                     $asset_make = nullable_htmlentities($row['asset_make']);
                     $asset_model = nullable_htmlentities($row['asset_model']);
                     $asset_serial = nullable_htmlentities($row['asset_serial']);
-                    $asset_inventory_barcode = nullable_htmlentities(isset($row['inventory_barcode']) ? $row['inventory_barcode'] : '');
+                    $asset_asset_inventory_barcode = nullable_htmlentities(isset($row['asset_inventory_barcode']) ? $row['asset_inventory_barcode'] : '');
                     $client_name = nullable_htmlentities($row['client_name']);
                     $contact_name = nullable_htmlentities($row['contact_name']);
                     $location_name = nullable_htmlentities($row['location_name']);
@@ -147,12 +147,12 @@ $sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients 
                         <td><?php echo $asset_model; ?></td>
                         <td><?php echo $asset_serial; ?></td>
                         <td>
-                            <?php echo $asset_inventory_barcode; ?>
-                            <?php if (!empty($asset_inventory_barcode)): ?>
+                            <?php echo $asset_asset_inventory_barcode; ?>
+                            <?php if (!empty($asset_asset_inventory_barcode)): ?>
                                 <br>
-                                <img id="barcode-img-<?php echo $asset_id; ?>" src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_inventory_barcode); ?>" alt="Barcode" height="40">
+                                <img id="barcode-img-<?php echo $asset_id; ?>" src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_asset_inventory_barcode); ?>" alt="Barcode" height="40">
                                 <br>
-                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="printBarcode('<?php echo htmlspecialchars($asset_inventory_barcode, ENT_QUOTES); ?>')">
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="printBarcode('<?php echo htmlspecialchars($asset_asset_inventory_barcode, ENT_QUOTES); ?>')">
                                     <i class="fas fa-print"></i> Print Inventory Barcode
                                 </button>
                             <?php endif; ?>

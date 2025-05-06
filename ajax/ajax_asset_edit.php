@@ -164,7 +164,7 @@ ob_start();
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-fw fa-barcode"></i></span>
                             </div>
-                            <input type="text" class="form-control" name="inventory_barcode" placeholder="Inventory barcode" maxlength="200" value="<?php echo $asset_inventory_barcode; ?>">
+                            <input type="text" class="form-control" name="asset_inventory_barcode" placeholder="Inventory barcode" maxlength="200" value="<?php echo $asset_asset_inventory_barcode; ?>">
                         </div>
                     </div>
                 <?php } ?>

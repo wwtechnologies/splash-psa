@@ -140,7 +140,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa fa-fw fa-barcode"></i></span>
                                         </div>
-                                        <input type="text" class="form-control" name="inventory_barcode" placeholder="Inventory barcode" maxlength="200">
+                                        <input type="text" class="form-control" name="asset_inventory_barcode" placeholder="Inventory barcode" maxlength="200">
                                     </div>
                                 </div>
                             <?php } ?>
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 dataType: 'json',
                 success: function(response) {
                     if (response.unique) {
-                        $modal.find('input[name="inventory_barcode"]').val(candidate);
+                        $modal.find('input[name="asset_inventory_barcode"]').val(candidate);
                     } else {
                         // Try again if not unique
                         setTimeout(checkAndSetBarcode, 50);
