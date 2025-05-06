@@ -276,7 +276,7 @@ if (isset($_GET['asset_id'])) {
                             <div class="my-2">
                                 <img
                                     id="barcode-image"
-                                    src="plugins/barcode/barcode.php?text=<?php echo urlencode($asset_inventory_barcode); ?>&size=40&print=true"
+                                    src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_inventory_barcode); ?>"
                                     alt="Barcode for <?php echo $asset_inventory_barcode; ?>"
                                     onerror="this.style.display='none';document.getElementById('barcode-error').style.display='block';"
                                 >
