@@ -35,7 +35,8 @@ if (!empty($where_array)) {
     $where = 'WHERE ' . implode(' AND ', $where_array);
 }
 
-$sql = mysqli_query($mysqli,"SELECT * FROM assets
+$sql = mysqli_query($mysqli,"SELECT assets.*, assets.inventory_barcode, clients.client_name, contacts.contact_name, locations.location_name, vendors.vendor_name
+    FROM assets
     LEFT JOIN clients ON asset_client_id = client_id
     LEFT JOIN contacts ON asset_contact_id = contact_id
     LEFT JOIN locations ON asset_location_id = location_id
@@ -130,7 +131,7 @@ $sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients 
                     $asset_make = nullable_htmlentities($row['asset_make']);
                     $asset_model = nullable_htmlentities($row['asset_model']);
                     $asset_serial = nullable_htmlentities($row['asset_serial']);
-                    $asset_inventory_barcode = nullable_htmlentities($row['inventory_barcode']);
+                    $asset_inventory_barcode = nullable_htmlentities(isset($row['inventory_barcode']) ? $row['inventory_barcode'] : '');
                     $client_name = nullable_htmlentities($row['client_name']);
                     $contact_name = nullable_htmlentities($row['contact_name']);
                     $location_name = nullable_htmlentities($row['location_name']);
