@@ -16,9 +16,18 @@ if (isset($_POST['add_asset'])) {
 
     $alert_extended = "";
 
+    // Generate unique barcode ID
+    do {
+        $inventory_barcode = strtoupper(bin2hex(random_bytes(6)));
+        $barcode_check = mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_inventory_barcode = '$inventory_barcode' LIMIT 1");
+    } while (mysqli_num_rows($barcode_check) > 0);
+
     mysqli_query($mysqli,"INSERT INTO assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_inventory_barcode = '$inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes', asset_client_id = $client_id");
 
     $asset_id = mysqli_insert_id($mysqli);
+
+    // Barcode image URL for UI display/printing
+    $barcode_image_url = "plugins/barcode/barcode.php?s=code128&d=$inventory_barcode";
 
     // Add Photo
     if (isset($_FILES['file']['tmp_name'])) {

@@ -145,7 +145,13 @@ $sql_clients = mysqli_query($mysqli,"SELECT client_id, client_name FROM clients 
                         <td><?php echo $asset_make; ?></td>
                         <td><?php echo $asset_model; ?></td>
                         <td><?php echo $asset_serial; ?></td>
-                        <td><?php echo $asset_inventory_barcode; ?></td>
+                        <td>
+                            <?php echo $asset_inventory_barcode; ?>
+                            <?php if (!empty($asset_inventory_barcode)): ?>
+                                <br>
+                                <img src="plugins/barcode/barcode.php?s=code128&d=<?php echo urlencode($asset_inventory_barcode); ?>" alt="Barcode" height="40">
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo $contact_name; ?></td>
                         <td><?php echo $location_name; ?></td>
                         <td><?php echo $vendor_name; ?></td>
