@@ -23,7 +23,7 @@ if (isset($_POST['add_asset'])) {
             // Provided barcode is not unique, generate a new one
             do {
                 $asset_inventory_barcode = strtoupper(bin2hex(random_bytes(6)));
-                $barcode_check = mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_asset_inventory_barcode = '$asset_inventory_barcode' LIMIT 1");
+                $barcode_check = mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_inventory_barcode = '$asset_inventory_barcode' LIMIT 1");
             } while (mysqli_num_rows($barcode_check) > 0);
         }
         // else: provided barcode is unique, use as is
@@ -31,11 +31,11 @@ if (isset($_POST['add_asset'])) {
         // No barcode provided, generate one
         do {
             $asset_inventory_barcode = strtoupper(bin2hex(random_bytes(6)));
-            $barcode_check = mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_asset_inventory_barcode = '$asset_inventory_barcode' LIMIT 1");
+            $barcode_check = mysqli_query($mysqli, "SELECT 1 FROM assets WHERE asset_inventory_barcode = '$asset_inventory_barcode' LIMIT 1");
         } while (mysqli_num_rows($barcode_check) > 0);
     }
 
-    mysqli_query($mysqli,"INSERT INTO assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_asset_inventory_barcode = '$asset_inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes', asset_client_id = $client_id");
+    mysqli_query($mysqli,"INSERT INTO assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_inventory_barcode = '$asset_inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes', asset_client_id = $client_id");
 
     $asset_id = mysqli_insert_id($mysqli);
 
@@ -105,7 +105,7 @@ if (isset($_POST['edit_asset'])) {
     $row = mysqli_fetch_array($sql);
     $existing_file_name = sanitizeInput($row['asset_photo']);
 
-    mysqli_query($mysqli,"UPDATE assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_asset_inventory_barcode = '$asset_inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes' WHERE asset_id = $asset_id");
+    mysqli_query($mysqli,"UPDATE assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_inventory_barcode = '$asset_inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes' WHERE asset_id = $asset_id");
 
     $sql_interfaces = mysqli_query($mysqli, "SELECT * FROM asset_interfaces WHERE interface_asset_id = $asset_id AND interface_primary = 1");
 
@@ -298,8 +298,8 @@ if (isset($_POST['bulk_transfer_client_asset'])) {
 
             // Create new asset
             mysqli_query($mysqli, "
-                INSERT INTO assets (asset_type, asset_name, asset_description, asset_make, asset_model, asset_serial, asset_asset_inventory_barcode, asset_os, asset_status, asset_purchase_date, asset_warranty_expire, asset_install_date, asset_notes, asset_important)
-                SELECT asset_type, asset_name, asset_description, asset_make, asset_model, asset_serial, asset_asset_inventory_barcode, asset_os, asset_status, asset_purchase_date, asset_warranty_expire, asset_install_date, asset_notes, asset_important
+                INSERT INTO assets (asset_type, asset_name, asset_description, asset_make, asset_model, asset_serial, asset_inventory_barcode, asset_os, asset_status, asset_purchase_date, asset_warranty_expire, asset_install_date, asset_notes, asset_important)
+                SELECT asset_type, asset_name, asset_description, asset_make, asset_model, asset_serial, asset_inventory_barcode, asset_os, asset_status, asset_purchase_date, asset_warranty_expire, asset_install_date, asset_notes, asset_important
                 FROM assets
                 WHERE asset_id = $current_asset_id
             ");
