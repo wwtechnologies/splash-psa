@@ -39,6 +39,32 @@ if (isset($_POST['add_asset'])) {
 
     $asset_id = mysqli_insert_id($mysqli);
 
+    // Handle config file upload for switch assets
+    $config_file_id = "NULL";
+    if ($type === "switch" && isset($_FILES['config_file']) && is_uploaded_file($_FILES['config_file']['tmp_name'])) {
+        $config_file = $_FILES['config_file'];
+        $config_filename = basename($config_file['name']);
+        $config_tmp_path = $config_file['tmp_name'];
+        $config_filetype = mysqli_real_escape_string($mysqli, $config_file['type']);
+        $config_filesize = intval($config_file['size']);
+        $config_upload_dir = "uploads/";
+        if (!file_exists($config_upload_dir)) {
+            mkdir($config_upload_dir, 0755, true);
+        }
+        $config_dest_path = $config_upload_dir . uniqid("cfg_", true) . "_" . preg_replace('/[^A-Za-z0-9_\.\-]/', '_', $config_filename);
+        if (move_uploaded_file($config_tmp_path, $config_dest_path)) {
+            $config_filename_esc = mysqli_real_escape_string($mysqli, $config_filename);
+            $config_dest_path_esc = mysqli_real_escape_string($mysqli, $config_dest_path);
+            $uploaded_by = isset($session_user_id) ? intval($session_user_id) : 0;
+            mysqli_query($mysqli, "INSERT INTO files (filename, path, size, type, uploaded_by, uploaded_at) VALUES ('$config_filename_esc', '$config_dest_path_esc', $config_filesize, '$config_filetype', $uploaded_by, NOW())");
+            $config_file_id = mysqli_insert_id($mysqli);
+            mysqli_query($mysqli, "UPDATE assets SET config_file_id = $config_file_id WHERE asset_id = $asset_id");
+        }
+    } else {
+        // Ensure config_file_id is NULL for non-switch or no file
+        mysqli_query($mysqli, "UPDATE assets SET config_file_id = NULL WHERE asset_id = $asset_id");
+    }
+
     // Barcode image URL for UI display/printing
     $barcode_image_url = "plugins/barcode/barcode.php?s=code128&d=$asset_inventory_barcode";
 
@@ -106,6 +132,31 @@ if (isset($_POST['edit_asset'])) {
     $existing_file_name = sanitizeInput($row['asset_photo']);
 
     mysqli_query($mysqli,"UPDATE assets SET asset_name = '$name', asset_description = '$description', asset_type = '$type', asset_make = '$make', asset_model = '$model', asset_serial = '$serial', asset_inventory_barcode = '$asset_inventory_barcode', asset_os = '$os', asset_uri = '$uri', asset_uri_2 = '$uri_2', asset_location_id = $location, asset_vendor_id = $vendor, asset_contact_id = $contact, asset_status = '$status', asset_purchase_reference = '$purchase_reference', asset_purchase_date = $purchase_date, asset_warranty_expire = $warranty_expire, asset_install_date = $install_date, asset_physical_location = '$physical_location', asset_notes = '$notes' WHERE asset_id = $asset_id");
+
+    // Handle config file upload for switch assets (edit)
+    if ($type === "switch" && isset($_FILES['config_file']) && is_uploaded_file($_FILES['config_file']['tmp_name'])) {
+        $config_file = $_FILES['config_file'];
+        $config_filename = basename($config_file['name']);
+        $config_tmp_path = $config_file['tmp_name'];
+        $config_filetype = mysqli_real_escape_string($mysqli, $config_file['type']);
+        $config_filesize = intval($config_file['size']);
+        $config_upload_dir = "uploads/";
+        if (!file_exists($config_upload_dir)) {
+            mkdir($config_upload_dir, 0755, true);
+        }
+        $config_dest_path = $config_upload_dir . uniqid("cfg_", true) . "_" . preg_replace('/[^A-Za-z0-9_\.\-]/', '_', $config_filename);
+        if (move_uploaded_file($config_tmp_path, $config_dest_path)) {
+            $config_filename_esc = mysqli_real_escape_string($mysqli, $config_filename);
+            $config_dest_path_esc = mysqli_real_escape_string($mysqli, $config_dest_path);
+            $uploaded_by = isset($session_user_id) ? intval($session_user_id) : 0;
+            mysqli_query($mysqli, "INSERT INTO files (filename, path, size, type, uploaded_by, uploaded_at) VALUES ('$config_filename_esc', '$config_dest_path_esc', $config_filesize, '$config_filetype', $uploaded_by, NOW())");
+            $config_file_id = mysqli_insert_id($mysqli);
+            mysqli_query($mysqli, "UPDATE assets SET config_file_id = $config_file_id WHERE asset_id = $asset_id");
+        }
+    } else if ($type !== "switch") {
+        // If asset is no longer a switch, clear config_file_id
+        mysqli_query($mysqli, "UPDATE assets SET config_file_id = NULL WHERE asset_id = $asset_id");
+    }
 
     $sql_interfaces = mysqli_query($mysqli, "SELECT * FROM asset_interfaces WHERE interface_asset_id = $asset_id AND interface_primary = 1");
 

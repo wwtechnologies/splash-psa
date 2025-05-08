@@ -257,6 +257,20 @@ if (isset($_GET['asset_id'])) {
                     <?php if ($asset_type) { ?>
                         <div><i class="fa fa-fw fa-tag text-secondary mr-3"></i><?php echo $asset_type; ?></div>
                     <?php }
+                    // Config file download/view link for switches
+                    if ($asset_type === "switch" && !empty($row['config_file_id'])) {
+                        $config_file_id = intval($row['config_file_id']);
+                        $config_file_sql = mysqli_query($mysqli, "SELECT file_reference_name, file_name FROM files WHERE file_id = $config_file_id LIMIT 1");
+                        if ($config_file_row = mysqli_fetch_array($config_file_sql)) {
+                            $config_file_reference = nullable_htmlentities($config_file_row['file_reference_name']);
+                            $config_file_name = nullable_htmlentities($config_file_row['file_name']);
+                            echo '<div class="mt-2"><i class="fa fa-fw fa-file-code text-secondary mr-3"></i>';
+                            echo 'Config File: ';
+                            echo '<a href="uploads/clients/' . $client_id . '/' . $config_file_reference . '" target="_blank" class="btn btn-sm btn-outline-primary mr-2" style="vertical-align: baseline;"><i class="fas fa-eye"></i> View</a>';
+                            echo '<a href="uploads/clients/' . $client_id . '/' . $config_file_reference . '" download="' . $config_file_name . '" class="btn btn-sm btn-outline-secondary" style="vertical-align: baseline;"><i class="fas fa-download"></i> Download</a>';
+                            echo '</div>';
+                        }
+                    }
                     if ($asset_make) { ?>
                         <div class="mt-2"><i class="fa fa-fw fa-circle text-secondary mr-3"></i><?php echo "$asset_make $asset_model"; ?></div>
                     <?php }

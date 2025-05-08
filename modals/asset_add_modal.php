@@ -102,6 +102,12 @@
                                 </div>
                             </div>
 
+                            <div class="form-group" id="config-file-group" style="display: none;">
+                                <label>Config File</label>
+                                <input type="file" class="form-control-file" name="config_file" accept=".cfg,.conf,.txt,.xml,.json,.zip,.tar,.gz,.7z,.rar,.ini,.csv,.yml,.yaml">
+                                <small class="form-text text-muted">Upload a configuration file (optional, only for switches).</small>
+                            </div>
+
                             <?php //Do not display Make Model or Serial if Virtual is selected
                             if ($_GET['type'] !== 'virtual') { ?>
                                 <div class="form-group">
@@ -484,5 +490,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         checkAndSetBarcode();
     });
+});
+</script>
+<script>
+$(document).ready(function() {
+    function toggleConfigFileField() {
+        var type = $('select[name="type"]').val();
+        if (type && type.toLowerCase() === 'switch') {
+            $('#config-file-group').show();
+        } else {
+            $('#config-file-group').hide();
+        }
+    }
+    // Initial check
+    toggleConfigFileField();
+    // On change
+    $('select[name="type"]').on('change', toggleConfigFileField);
 });
 </script>
