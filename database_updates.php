@@ -31,6 +31,13 @@ if (LATEST_DATABASE_VERSION > CURRENT_DATABASE_VERSION) {
         mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.8'");
     }
 
+    if (CURRENT_DATABASE_VERSION == '2.1.8') {
+        // Add config_file_id column to assets table and reference files table
+        mysqli_query($mysqli, "ALTER TABLE `assets` ADD `config_file_id` INT(11) NULL DEFAULT NULL AFTER `asset_id`;");
+        mysqli_query($mysqli, "ALTER TABLE `assets` ADD CONSTRAINT `fk_assets_config_file_id` FOREIGN KEY (`config_file_id`) REFERENCES `files`(`file_id`) ON DELETE SET NULL ON UPDATE CASCADE;");
+        mysqli_query($mysqli, "UPDATE `settings` SET `config_current_database_version` = '2.1.9'");
+    }
+
     if (CURRENT_DATABASE_VERSION == '2.1.5') {
         // Create todos table
         mysqli_query($mysqli, "CREATE TABLE IF NOT EXISTS `todos` (
