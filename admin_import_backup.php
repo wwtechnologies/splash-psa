@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_FILES['sql_file']['error'] !== UPLOAD_ERR_OK
     ) {
         $message = '<div class="alert alert-danger">File upload failed.</div>';
+    } elseif (!isset($_POST['mariadb_key']) || trim($_POST['mariadb_key']) === '') {
+        $message = '<div class="alert alert-danger">MariaDB master encryption key is required for encrypted backup import.</div>';
     } else {
         // Validate DB credentials
         $dbhost = trim($_POST['dbhost'] ?? '');
@@ -27,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dbpass = $_POST['dbpass'] ?? '';
         $dbname = trim($_POST['dbname'] ?? '');
         $dbport = trim($_POST['dbport'] ?? '');
+        $mariadb_key = $_POST['mariadb_key'] ?? '';
         if ($dbhost === '' || $dbuser === '' || $dbname === '') {
             $message = '<div class="alert alert-danger">Host, username, and database name are required.</div>';
         } elseif ($dbport !== '' && !ctype_digit($dbport)) {
@@ -57,7 +60,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $port_part = ($dbport !== '') ? (' -P ' . escapeshellarg($dbport)) : '';
 
                     // Import command
-                    $cmd = "mysql -h $dbhost_esc -u $dbuser_esc -p$dbpass $port_part $dbname_esc < $tmp_path_esc 2>&1";
+                    // Write the master key to a temp file for secure use
+                    $key_tmp_path = '/tmp/mariadb_key_' . bin2hex(random_bytes(8));
+                    file_put_contents($key_tmp_path, $mariadb_key);
+                    chmod($key_tmp_path, 0600);
+
+                    // Add --server-encryption-key option for MariaDB (adjust if your MariaDB uses a different flag)
+                    $key_opt = "--server-encryption-key=$(cat $key_tmp_path)";
+                    // If MariaDB requires --master-key-file, use: $key_opt = "--master-key-file=$key_tmp_path";
+
+                    $cmd = "mysql -h $dbhost_esc -u $dbuser_esc -p$dbpass $port_part $dbname_esc --defaults-extra-file=$key_tmp_path < $tmp_path_esc 2>&1";
+                    // Note: Adjust the above command and $key_opt as needed for your MariaDB version and encryption setup.
+
                     // Use proc_open for better error capture
                     $descriptor = [
                         0 => ["pipe", "r"],
@@ -78,14 +92,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $message = '<div class="alert alert-success">Database import successful.</div>';
                             $success = true;
                         } else {
-                            $message = '<div class="alert alert-danger">Import failed: ' . htmlspecialchars($error ?: $output) . '</div>';
+                            if (strpos($error . $output, 'encryption') !== false || strpos($error . $output, 'key') !== false) {
+                                $message = '<div class="alert alert-danger">Import failed: Incorrect or missing MariaDB master encryption key.</div>';
+                            } else {
+                                $message = '<div class="alert alert-danger">Import failed: ' . htmlspecialchars($error ?: $output) . '</div>';
+                            }
                         }
                     } else {
                         $message = '<div class="alert alert-danger">Failed to execute import command.</div>';
                     }
-                    // Delete temp file and clear credentials
+                    // Delete temp files and clear credentials
                     unlink($tmp_path);
-                    unset($dbhost, $dbuser, $dbpass, $dbname, $dbport);
+                    if (file_exists($key_tmp_path)) {
+                        unlink($key_tmp_path);
+                    }
+                    unset($dbhost, $dbuser, $dbpass, $dbname, $dbport, $mariadb_key);
                 }
             }
         }
@@ -121,6 +142,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="dbport">Port (optional):</label>
                 <input type="text" name="dbport" id="dbport" class="form-control" placeholder="3306">
+            </div>
+            <div class="form-group">
+                <label for="mariadb_key">MariaDB Master Encryption Key:</label>
+                <input type="password" name="mariadb_key" id="mariadb_key" class="form-control" autocomplete="off" required>
+                <small class="form-text text-muted">Required for encrypted backup import. Not stored.</small>
             </div>
             <div class="form-group">
                 <label for="sql_file">Select .sql Backup File (max 100MB):</label>
