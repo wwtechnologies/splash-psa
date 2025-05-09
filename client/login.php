@@ -4,12 +4,10 @@
  * Landing / Home page for the client portal
  */
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'");
 
 require_once '../config.php';
-
 require_once '../functions.php';
-
 require_once '../includes/get_settings.php';
 
 if (!isset($_SESSION)) {
@@ -103,110 +101,107 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
         }
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title><?php echo $company_name; ?> | Client Portal Login</title>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><?php echo $company_name; ?> | Client Portal Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
 
-        <!-- Tell the browser to be responsive to screen width -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="noindex">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
 
-        <!-- Favicon - If Fav Icon exists else use the default one -->
-        <?php if(file_exists('../uploads/favicon.ico')) { ?>
-            <link rel="icon" type="image/x-icon" href="../uploads/favicon.ico">
-        <?php } ?>
+    <!-- Favicon -->
+    <?php if(file_exists('../uploads/favicon.ico')) { ?>
+        <link rel="icon" type="image/x-icon" href="../uploads/favicon.ico">
+    <?php } ?>
 
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../plugins/adminlte/css/adminlte.min.css">
 
-        <!-- Theme style -->
-        <link rel="stylesheet" href="../plugins/adminlte/css/adminlte.min.css">
-
-    </head>
-
-    <body class="hold-transition login-page">
-    <div class="login-box">
-        <div class="login-logo">
-            <?php if (!empty($company_logo)) { ?>
-                <img alt="<?=$company_name?> logo" height="110" width="380" class="img-fluid" src="<?php echo "../uploads/settings/$company_logo"; ?>">
-            <?php } else { ?>
-                <b><?=$company_name?></b> <br>Client Portal Login</h2>
-            <?php } ?>
-        </div>
-        <div class="card">
-            <div class="card-body login-card-body">
-                <?php if(!empty($config_login_message)){ ?>
-                <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
+    <!-- Custom Login CSS -->
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-form">
+                <h1>Welcome</h1>
+                <p class="subtitle">Secure access to your IT documentation and asset management portal. Login to manage your infrastructure.</p>
+                
+                <?php if (!empty($config_login_message)){ ?>
+                <p class="mb-4"><?php echo nl2br($config_login_message); ?></p>
                 <?php } ?>
-                <?php
-                if (!empty($_SESSION['login_message'])) { ?>
-                    <p class="login-box-msg text-danger">
-                    <?php
-                    echo $_SESSION['login_message'];
-                    unset($_SESSION['login_message']);
-                    ?>
-                    </p>
-                <?php
-                }
-                ?>
+
+                <?php if (!empty($_SESSION['login_message'])) { ?>
+                <div class="mb-4">
+                    <div class="alert alert-danger">
+                        <?php
+                        echo $_SESSION['login_message'];
+                        unset($_SESSION['login_message']);
+                        ?>
+                        <button class="close" data-dismiss="alert">&times;</button>
+                    </div>
+                </div>
+                <?php } ?>
+
                 <form method="post">
-                    <div class="input-group mb-3">
+                    <div class="form-group">
                         <input type="text" class="form-control" placeholder="Registered Client Email" name="email" required autofocus>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
-                            </div>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    
+                    <div class="form-group">
                         <input type="password" class="form-control" placeholder="Client Password" name="password" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
-                            </div>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-success btn-block mb-3" name="login">Sign in</button>
-
-                    <hr>
-
-                    <?php
-                    if (!empty($config_smtp_host)) { ?>
-                        <h5 class="text-center"><a href="login_reset.php">Forgot password?</a></h5>
-                    <?php } ?>
-
-                </form>
-
-                <?php
-                if (!empty($azure_client_id)) { ?>
-                    <hr>
-                    <div class="col text-center">
-                        <a href="login_microsoft.php">
-                            <button type="button" class="btn btn-secondary">Login with Microsoft Entra</button>
-                        </a>
+                    
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember_me" name="remember_me">
+                        <label for="remember_me">Remember me</label>
                     </div>
+                    
+                    <button type="submit" class="btn-login" name="login">Login</button>
+                    
+                    <div class="login-links">
+                        <a href="#">Request Access</a>
+                        <?php if (!empty($config_smtp_host)) { ?>
+                        <a href="login_reset.php">Forgot Password?</a>
+                        <?php } ?>
+                    </div>
+                </form>
+                
+                <?php if (!empty($azure_client_id)) { ?>
+                <hr>
+                <div class="col text-center">
+                    <a href="login_microsoft.php">
+                        <button type="button" class="btn btn-secondary">Login with Microsoft Entra</button>
+                    </a>
+                </div>
                 <?php } ?>
-
             </div>
-            <!-- /.login-card-body -->
-
+            
+            <div class="login-image">
+                <div class="brand-logo">
+                    <?php if (!empty($company_logo)) { ?>
+                        <img src="<?php echo "../uploads/settings/$company_logo"; ?>" alt="<?php echo htmlspecialchars($company_name); ?> Logo" class="logo-img">
+                    <?php } else { ?>
+                        <span><?php echo htmlspecialchars($company_name); ?></span>
+                    <?php } ?>
+                </div>
+                <div class="brand-tagline">
+                    Comprehensive IT Documentation & Asset Management Portal
+                </div>
+            </div>
         </div>
-        <!-- /.div.card -->
-
     </div>
-    <!-- /.login-box -->
-
-    <?php
-    if (!$config_whitelabel_enabled) {
-        echo '<small class="text-muted">Powered by ITFlow</small>';
-    }
-    ?>
 
     <!-- jQuery -->
     <script src="../plugins/jquery/jquery.min.js"></script>
@@ -219,6 +214,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
 
     <!-- Prevents resubmit on refresh or back -->
     <script src="../js/login_prevent_resubmit.js"></script>
-
-    </body>
+</body>
 </html>
